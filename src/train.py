@@ -20,6 +20,7 @@ from keras.layers.embeddings import Embedding
 from sklearn.metrics import classification_report,roc_auc_score,accuracy_score
 from sklearn.metrics import roc_curve, auc
 from sklearn.utils import shuffle
+from imblearn.under_sampling import RandomUnderSampler
 
 
 parser = argparse.ArgumentParser(description='VirNet a deep neural network model for virus identification')
@@ -29,7 +30,8 @@ parser.add_argument('--batch_size', dest='batch_size', type=int, default=512, he
 parser.add_argument('--cell_type', dest='model_name', default='lstm', help='model type which is lstm,gru,rnn (default: lstm)')
 parser.add_argument('--n_layers', dest='n_layers', type=int, default=1, help='number of layers(default: 1)')
 parser.add_argument('--n_neurons', dest='nn', type=int, default=128, help='number of neurons(default: 128)')
-parser.add_argument('--epoch', dest='ep', type=int, default=20, help='number of epochs(default: 20)')
+parser.add_argument('--lr', dest='lr', type=float, default=0.01, help='learning rate(default: 0.01)')
+parser.add_argument('--epoch', dest='ep', type=int, default=30, help='number of epochs(default: 30)')
 parser.add_argument('--data', dest='data', default='../data/2-fragments/csv', help='train mode (mode =0) Training and Testing data dir, eval mode (mode =1) path of test file')
 parser.add_argument('--sample', dest='is_sample', type=bool, default=False, help='Training and Testing data dir')
 parser.add_argument('--model_path', dest='model_path', default='model.h5', help='in case you are in in eval model ')
@@ -44,8 +46,9 @@ n_layers=args.n_layers
 ep=args.ep
 batch_size=args.batch_size
 data_dir=args.data
+lr=args.lr
 
-experiment_name='{0}_I{1}_L{2}_N{3}_ep{4}'.format(model_name,input_dim,n_layers,nn,ep)
+experiment_name='{0}_I{1}_L{2}_N{3}_ep{4}_lr{5}'.format(model_name,input_dim,n_layers,nn,ep,lr)
 data_file='{0}_{1}.fna_{2}.csv'
 if(args.mode):
     model_path=args.model_path
@@ -89,7 +92,7 @@ def load_csv(file_path):
         df['LABEL']=0
     return df
 
-def process_data(df_train):
+def process_data(df_train,is_sample=False):
     print('Preporcessing and Decoding SEQ chars')
     dna_dict={'A':1,'C':2,'G':3,'T':4,'N':5,' ':0}
     def decode(seq):
@@ -98,10 +101,6 @@ def process_data(df_train):
         for i in range(len(seq[:input_dim])):
             new_seq[i]=dna_dict[seq[i]]
         return new_seq.astype(np.int)
-
-    def one_hot_encode(x, n_classes):
-        return np.eye(n_classes)[x]
-
     """    
     dna_list=[' ','A','C','G','T','N']
     def encode(seq):
@@ -114,12 +113,20 @@ def process_data(df_train):
     X_train=df_train['SEQ'].values.tolist()
     y_train=df_train['LABEL'].values
 
+    if(is_sample):
+        print('UnderSample Data')
+        rus = RandomUnderSampler(random_state=42)
+        rus.fit(X_train, y_train)
+        X_train, y_train = rus.sample(X_train, y_train)
+
+
+    print('Suffle Data')
+    X_train , y_train = shuffle(X_train, y_train, random_state=42)
+    print('Shape of Data {0}'.format(len(X_train)))
+
     X_train=np.array(X_train).reshape(len(X_train),input_dim,1)
     #y_train=one_hot_encode(y_train,output_dim)
 
-    print('Suffle data')
-    X_train , y_train = shuffle(X_train, y_train, random_state=42)
-    print(X_train.shape)
     return X_train,y_train
 
 
@@ -127,15 +134,23 @@ def process_data(df_train):
 def create_model(model_name,input_dim,output_dim,nn,n_layers):
     print('Creating {0} Model'.format(model_name))
     model = Sequential()
-    if model_name is 'lstm':
+    if model_name == 'lstm':
         rnn_cell=LSTM
-    elif model_name is 'gru':
+    elif model_name == 'gru':
         rnn_cell=GRU
-    else:
+    elif model_name == 'rnn':
         rnn_cell=RNN
-    for i in range(n_layers):
+    else:
+        rnn_cell=LSTM
+
+    if(n_layers>1):
         model.add(rnn_cell(nn,kernel_initializer='normal',input_shape=(input_dim,1),return_sequences=True,recurrent_dropout=0.1))
-    model.add(rnn_cell(nn,kernel_initializer='normal',recurrent_dropout=0.1))
+        for _ in range(n_layers-2):
+                model.add(rnn_cell(nn,kernel_initializer='normal',return_sequences=True,recurrent_dropout=0.1))
+        model.add(rnn_cell(nn,kernel_initializer='normal',recurrent_dropout=0.1))
+    else:
+        model.add(rnn_cell(nn,kernel_initializer='normal',input_shape=(input_dim,1),recurrent_dropout=0.1))
+
     model.add(Dropout(0.2))
     model.add(Dense(nn//2,kernel_initializer='normal', activation='relu'))
     model.add(Dropout(0.2))
@@ -149,10 +164,11 @@ def create_model(model_name,input_dim,output_dim,nn,n_layers):
 def train_model(model,X_train,y_train):
     print('Training starting ... ')
     start_t=time.time()
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    adam=optimizers.Adam(lr=args.lr)
+    model.compile(loss='binary_crossentropy', optimizer=adam, metrics=['accuracy'])
     checkpoint = keras.callbacks.ModelCheckpoint(filepath=model_path, monitor='val_acc', verbose=1)
-    #earlystop = keras.callbacks.EarlyStopping(monitor='val_acc', min_delta=0.0001, patience=4, verbose=1)
-    history=model.fit(np.array(X_train),y_train,batch_size=batch_size, shuffle=True, epochs=ep,validation_split=0.2,verbose=2,callbacks=[checkpoint])
+    earlystop = keras.callbacks.EarlyStopping(monitor='val_acc', min_delta=0.0001, patience=5, verbose=1)
+    history=model.fit(np.array(X_train),y_train,batch_size=batch_size, shuffle=True, epochs=ep,validation_split=0.1,verbose=2,callbacks=[checkpoint,earlystop])
     end_t=time.time()
     logs.append('Training time\t{0:.2f} sec\n'.format(end_t-start_t))
     return history
@@ -241,8 +257,8 @@ def main():
     else:
         print('Starting Experiment {0}'.format(experiment_name))
         df_train,df_test=load_data()
-        X_train,y_train=process_data(df_train)
-        X_test,y_test=process_data(df_test)
+        X_train,y_train=process_data(df_train,is_sample=True)
+        X_test,y_test=process_data(df_test,is_sample=False)
         model=create_model(model_name,input_dim,output_dim,nn,n_layers)
         history=train_model(model,X_train,y_train)
         plot_train(history)
