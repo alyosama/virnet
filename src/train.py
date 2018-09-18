@@ -25,14 +25,14 @@ from imblearn.under_sampling import RandomUnderSampler
 
 parser = argparse.ArgumentParser(description='VirNet a deep neural network model for virus identification')
 parser.add_argument('--mode', dest='mode',type=bool, default=False, help='if you want train mode (0) or eval mode (1) (default: 0)')
-parser.add_argument('--input_dim', dest='input_dim', type=int, default=500, help='input dim (default: 500)')
+parser.add_argument('--input_dim', dest='input_dim', type=int, default=100, help='input dim (default: 100)')
 parser.add_argument('--batch_size', dest='batch_size', type=int, default=512, help='Batch size (default: 512)')
 parser.add_argument('--cell_type', dest='model_name', default='lstm', help='model type which is lstm,gru,rnn (default: lstm)')
 parser.add_argument('--n_layers', dest='n_layers', type=int, default=1, help='number of layers(default: 1)')
 parser.add_argument('--n_neurons', dest='nn', type=int, default=128, help='number of neurons(default: 128)')
 parser.add_argument('--lr', dest='lr', type=float, default=0.01, help='learning rate(default: 0.01)')
 parser.add_argument('--epoch', dest='ep', type=int, default=30, help='number of epochs(default: 30)')
-parser.add_argument('--data', dest='data', default='../data/2-fragments/csv', help='train mode (mode =0) Training and Testing data dir, eval mode (mode =1) path of test file')
+parser.add_argument('--data', dest='data', default='../../data/3-fragments/fna', help='train mode (mode =0) Training and Testing data dir, eval mode (mode =1) path of test file')
 parser.add_argument('--sample', dest='is_sample', type=bool, default=False, help='Training and Testing data dir')
 parser.add_argument('--model_path', dest='model_path', default='model.h5', help='in case you are in in eval model ')
 
@@ -54,19 +54,31 @@ if(args.mode):
     model_path=args.model_path
 else:
     model_path='models/model_'+experiment_name+'{epoch:02d}-{val_acc:.2f}.h5'
-genomes=['archaea','bacteria','viral']
+genomes=['non-viral','viral']
 logs=[]
 
 
+
 def load_data():
+    def load_fasta(file_path):
+        data_list=[]
+        for record in SeqIO.parse(file_path, "fasta"):
+            data_list.append([record.id,str(record.seq)])
+        print('Loaded {0} fragments'.format(len(data_list)))
+
+        df=pd.DataFrame(data_list,columns=['ID','SEQ'])
+        return df
+
     def load_csv_fragments(genome,ty,input_dim):
         data_path=os.path.join(data_dir,data_file.format(genome,ty,input_dim))
-        df=pd.read_csv(data_path)
+        #df=pd.read_csv(data_path)
+        df=load_fasta(data_path)
         if genome is 'viral':
             df['LABEL']=1
         else:
             df['LABEL']=0
         return df
+        
     print('Loading training and testing data')
     df_train=pd.DataFrame()
     df_test=pd.DataFrame()
@@ -84,19 +96,14 @@ def load_data():
         df_test=df_test.sample(n_sample)
     return df_train,df_test
 
-def load_csv(file_path):
-    df=pd.read_csv(file_path)
-    if('viral' in file_path):
-        df['LABEL']=1
-    else:
-        df['LABEL']=0
-    return df
 
 def process_data(df_train,is_sample=False):
     print('Preporcessing and Decoding SEQ chars')
     dna_dict={'A':1,'C':2,'G':3,'T':4,'N':5,' ':0}
     def decode(seq):
         new_seq=np.zeros(input_dim)
+
+        ## TODO Replace ambiguous char
         seq=re.sub(r'[^ATGCN]','N',seq.upper())
         for i in range(len(seq[:input_dim])):
             new_seq[i]=dna_dict[seq[i]]
@@ -247,22 +254,14 @@ def evaluate_model(model,X_test,y_test):
     np.save('experiments/{0}_test_logits.txt'.format(experiment_name), y_prop)
 
 def main():
-    if(args.mode):
-        print('Starting VirNet')
-        df_eval=load_csv(args.data)
-        X_test,y_test=process_data(df_eval)
-        model=create_model(model_name,input_dim,output_dim,nn,n_layers)
-        model=load_nn_model(model,model_path)
-        evaluate_model(model,X_test,y_test)
-    else:
-        print('Starting Experiment {0}'.format(experiment_name))
-        df_train,df_test=load_data()
-        X_train,y_train=process_data(df_train,is_sample=True)
-        X_test,y_test=process_data(df_test,is_sample=False)
-        model=create_model(model_name,input_dim,output_dim,nn,n_layers)
-        history=train_model(model,X_train,y_train)
-        plot_train(history)
-        evaluate_model(model,X_test,y_test)
+    print('Starting Experiment {0}'.format(experiment_name))
+    df_train,df_test=load_data()
+    X_train,y_train=process_data(df_train,is_sample=True)
+    X_test,y_test=process_data(df_test,is_sample=False)
+    model=create_model(model_name,input_dim,output_dim,nn,n_layers)
+    history=train_model(model,X_train,y_train)
+    plot_train(history)
+    evaluate_model(model,X_test,y_test)
 
 if __name__ == "__main__":
     main()
