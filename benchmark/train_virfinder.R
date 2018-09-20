@@ -5,7 +5,6 @@
 #biocLite("qvalue")
 #install.packages("E:/masters/benchmark/virfinder/VirFinder/windows/VirFinder_1.1.zip", repos = NULL, type="source")  
 
-
 library(VirFinder)
 
 

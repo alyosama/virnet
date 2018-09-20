@@ -15,9 +15,9 @@ fna_dir <- file.path("../../data/3-fragments/fna")
 output_dir <- file.path("../../benchmark/results")
 
 
-run_virFinder <- function(test_file) {
+run_virFinder <- function(testPath) {
+  test_file <- basename(testPath)
   cat("Current working file: ", test_file,'\n')
-  testPath  <- file.path(fna_dir,test_file)
   ## (2) prediction
   capture.output(predResult <- VF.pred(testPath), file='/dev/null')
 
@@ -31,16 +31,31 @@ run_virFinder <- function(test_file) {
 }
 
 
-print('Start VirFinder')
 no_cores <- detectCores() - 1
 registerDoParallel(cores=no_cores)
 getDoParWorkers()
 
-foreach(test_file = list.files(fna_dir)) %dopar% {
-  if(grepl('test',test_file)){
+run_fragments <- function(){
+  print('Start VirFinder Fragments')
+  fragments_files <- list.files(fna_dir)
+  foreach(test_file = fragments_files) %dopar% {
+    if(grepl('test',test_file)){
+      testPath  <- file.path(fna_dir,test_file)
+      system.time(run_virFinder(testPath))
+    }
+  }
+}
+
+run_metgenome<- function(){
+  print('Start VirFinder Metagenome')
+  fragments_files <- list('../../data/4-metagenome/microbiome/microbiome-reads.fa','../../data/4-metagenome/virome/virome-reads.fa')
+  foreach(test_file = fragments_files) %dopar% {
     system.time(run_virFinder(test_file))
   }
 }
+
+#run_fragments()
+run_metgenome()
 
 
 
