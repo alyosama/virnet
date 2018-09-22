@@ -200,6 +200,30 @@ We tried different fragment length (n=100,500,1000,3000) with VirFinder and we f
 	\label{table:virfinder_results}
 \end{table}
 
+
+We tried VirFinder on the simulated metagenomes and we found that VirFinder accuracy is arround 65\%. See figure \ref{fig:roc_auc_virfinder_simulated} and table \ref{table:virfinder_results_simulated}.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\columnwidth]{imgs/roc_auc_simulated.png}
+	\caption{VirFinder ROC-AUC curves on Simulated metagenomes}
+	\label{fig:roc_auc_virfinder_simulated}
+\end{figure}
+
+
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{||c c c c c||} 
+		Length(N) &	Accuracy & Avg. Precision & Avg. Recall &	ROC-AUC Score \\ [0.5ex] 
+		\hline\hline
+		Virome &	62.77\%	& 0.72 & 0.63 & 0.63 \\
+		Microbiome &	64.49\% &	0.72 & 0.64 & 0.64 \\ [1ex]
+	\end{tabular}
+	\caption{VirFinder Results on our Simulated Metagenomes}
+	\label{table:virfinder_results_simulated}
+\end{table}
+
 \section{Discussion}
 
 In our tool, there are no handmade features as the network will learn how to extract appropriate features for the raw data. It shows better accuracy as it is trained with the updated viral databases with a good statistical model. This helps us to generalize this model with all genomes and to make a generalized model for sequence classification. We also able to identify the short viral sequences as LSTM learns from the dependences between the input sequence. 
