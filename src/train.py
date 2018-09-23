@@ -4,12 +4,14 @@ import gzip
 import random
 import datetime
 import time
+import argparse
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 from contextlib import redirect_stdout
-import argparse
+from Bio import SeqIO
+
 
 import keras
 from keras import callbacks
@@ -28,45 +30,53 @@ parser.add_argument('--mode', dest='mode',type=bool, default=False, help='if you
 parser.add_argument('--input_dim', dest='input_dim', type=int, default=500, help='input dim (default: 500)')
 parser.add_argument('--batch_size', dest='batch_size', type=int, default=512, help='Batch size (default: 512)')
 parser.add_argument('--cell_type', dest='model_name', default='lstm', help='model type which is lstm,gru,rnn (default: lstm)')
-parser.add_argument('--n_layers', dest='n_layers', type=int, default=1, help='number of layers(default: 1)')
+parser.add_argument('--n_layers', dest='n_layers', type=int, default=2, help='number of layers(default: 2)')
 parser.add_argument('--n_neurons', dest='nn', type=int, default=128, help='number of neurons(default: 128)')
 parser.add_argument('--lr', dest='lr', type=float, default=0.01, help='learning rate(default: 0.01)')
 parser.add_argument('--epoch', dest='ep', type=int, default=30, help='number of epochs(default: 30)')
 parser.add_argument('--data', dest='data', default='../../data/3-fragments/fna', help='train mode (mode =0) Training and Testing data dir, eval mode (mode =1) path of test file')
-parser.add_argument('--sample', dest='is_sample', type=bool, default=False, help='Training and Testing data dir')
+parser.add_argument('--balance_data', dest='balance_data', type=bool, default=True, help='Balance data for two classes using undersampler')
+parser.add_argument('--work_dir', dest='work_dir', default='../../work_dir', help='Training Work dir')
 parser.add_argument('--model_path', dest='model_path', default='model.h5', help='in case you are in in eval model ')
 
-
+######### PARAMS #############
 args = parser.parse_args()
+genomes=['non_viral','viral']
 model_name=args.model_name
 input_dim=args.input_dim
 output_dim=1
-nn=args.nn
-n_layers=args.n_layers
-ep=args.ep
-batch_size=args.batch_size
 data_dir=args.data
-lr=args.lr
 
-experiment_name='{0}_I{1}_L{2}_N{3}_ep{4}_lr{5}'.format(model_name,input_dim,n_layers,nn,ep,lr)
+
+######## FILE PATHS ##########
+experiment_name='{0}_I{1}_L{2}_N{3}_ep{4}_lr{5}'.format(model_name,input_dim,args.n_layers,args.nn,args.ep,args.lr)
 data_file='{0}_{1}.fna_{2}.fna'
+model_dir=os.path.join(args.work_dir,'models')
+experiment_dir=os.path.join(args.work_dir,'experiments')
 if(args.mode):
     model_path=args.model_path
 else:
-    model_path='models/model_'+experiment_name+'{epoch:02d}-{val_acc:.2f}.h5'
-genomes=['non-viral','viral']
+    model_path=os.path.join(model_dir,'model_'+experiment_name+'{epoch:02d}-{val_acc:.2f}.h5')
+experiment_curve_file_path=os.path.join(experiment_dir,'{0}_roc_curve.png'.format(experiment_name))
+experiment_logs_file_path=os.path.join(experiment_dir,'{0}_logs.txt'.format(experiment_name))
+experiment_traincurve_file_path=os.path.join(experiment_dir,'{0}_train_curve.png'.format(experiment_name))
+experiment_logits_file_path=os.path.join(experiment_dir,'{0}_logits.h5'.format(experiment_name))
+
+
+############ HELPER FUNCTIONS ############
 logs=[]
-
-
 def create_dirs():
-    pass
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
+    if not os.path.exists(experiment_dir):
+        os.makedirs(experiment_dir)
 
 def load_data():
     def load_fasta(file_path):
         data_list=[]
         for record in SeqIO.parse(file_path, "fasta"):
             data_list.append([record.id,str(record.seq)])
-        print('Loaded {0} fragments'.format(len(data_list)))
+        print('Loaded {0} fragments from {1}'.format(len(data_list),file_path))
 
         df=pd.DataFrame(data_list,columns=['ID','SEQ'])
         return df
@@ -91,7 +101,7 @@ def load_data():
     print('Training len {0}'.format(len(df_train)))
     print('Testing len {0}'.format(len(df_test)))
 
-    if(args.is_sample):
+    if(args.balance_data):
         n_sample=500
         print('Sample first {0} of data'.format(n_sample))
         df_train=df_train.sample(n_sample)
@@ -99,7 +109,7 @@ def load_data():
     return df_train,df_test
 
 
-def process_data(df_train,is_sample=False):
+def process_data(df_train,balance_data=False):
     print('Preporcessing and Decoding SEQ chars')
     dna_dict={'A':1,'C':2,'G':3,'T':4,'N':5,' ':0}
     def decode(seq):
@@ -122,12 +132,11 @@ def process_data(df_train,is_sample=False):
     X_train=df_train['SEQ'].values.tolist()
     y_train=df_train['LABEL'].values
 
-    if(is_sample):
+    if(balance_data):
         print('UnderSample Data')
         rus = RandomUnderSampler(random_state=42)
         rus.fit(X_train, y_train)
         X_train, y_train = rus.sample(X_train, y_train)
-
 
     print('Suffle Data')
     X_train , y_train = shuffle(X_train, y_train, random_state=42)
@@ -165,7 +174,8 @@ def create_model(model_name,input_dim,output_dim,nn,n_layers):
     model.add(Dropout(0.2))
     model.add(Dense(output_dim,kernel_initializer='normal', activation='sigmoid'))
     print(model.summary())
-    with open('experiments/{0}_model_arc.txt'.format(experiment_name), 'w') as f:
+    experiment_file_path=os.path.join(experiment_dir,'{0}_model_arc.txt'.format(experiment_name))
+    with open(experiment_file_path, 'w') as f:
         with redirect_stdout(f):
             model.summary()
     return model
@@ -177,7 +187,7 @@ def train_model(model,X_train,y_train):
     model.compile(loss='binary_crossentropy', optimizer=adam, metrics=['accuracy'])
     checkpoint = keras.callbacks.ModelCheckpoint(filepath=model_path, monitor='val_acc', verbose=1)
     earlystop = keras.callbacks.EarlyStopping(monitor='val_acc', min_delta=0.0001, patience=5, verbose=1)
-    history=model.fit(np.array(X_train),y_train,batch_size=batch_size, shuffle=True, epochs=ep,validation_split=0.1,verbose=2,callbacks=[checkpoint,earlystop])
+    history=model.fit(np.array(X_train),y_train,batch_size=args.batch_size, shuffle=True, epochs=args.ep,validation_split=0.1,verbose=2,callbacks=[checkpoint,earlystop])
     end_t=time.time()
     logs.append('Training time\t{0:.2f} sec\n'.format(end_t-start_t))
     return history
@@ -203,7 +213,7 @@ def plot_train(history):
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
     #plt.show()
-    plt.savefig('experiments/{0}_train_curve.png'.format(experiment_name))
+    plt.savefig(experiment_traincurve_file_path)
     
 
 def plot_roc_curve(y_test,y_prop):
@@ -228,7 +238,7 @@ def plot_roc_curve(y_test,y_prop):
     plt.ylabel('True Positive Rate')
     plt.title('ROC-AUC Curve')
     plt.legend(loc="lower right")
-    plt.savefig('experiments/{0}_roc_curve.png'.format(experiment_name))
+    plt.savefig(experiment_curve_file_path)
 
 def predict_classes(proba):
     thresh=0.5
@@ -251,16 +261,17 @@ def evaluate_model(model,X_test,y_test):
     logs.append('Predicting time\t{0:.2f} sec\n'.format(end-start))
     plot_roc_curve(y_test,y_pred)
     print(''.join(logs))
-    with open('experiments/{0}_logs.txt'.format(experiment_name),'w') as f:
+    with open(experiment_logs_file_path,'w') as f:
         f.write(''.join(logs))
-    np.save('experiments/{0}_test_logits.txt'.format(experiment_name), y_prop)
+    #np.save(experiment_logits_file_path, y_prop)
 
 def main():
     print('Starting Experiment {0}'.format(experiment_name))
+    create_dirs()
     df_train,df_test=load_data()
-    X_train,y_train=process_data(df_train,is_sample=args.is_sample)
-    X_test,y_test=process_data(df_test,is_sample=args.is_sample)
-    model=create_model(model_name,input_dim,output_dim,nn,n_layers)
+    X_train,y_train=process_data(df_train,balance_data=args.balance_data)
+    X_test,y_test=process_data(df_test)
+    model=create_model(model_name,input_dim,output_dim,args.nn,args.n_layers)
     history=train_model(model,X_train,y_train)
     plot_train(history)
     evaluate_model(model,X_test,y_test)
