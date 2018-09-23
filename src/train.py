@@ -35,7 +35,8 @@ parser.add_argument('--n_neurons', dest='nn', type=int, default=128, help='numbe
 parser.add_argument('--lr', dest='lr', type=float, default=0.01, help='learning rate(default: 0.01)')
 parser.add_argument('--epoch', dest='ep', type=int, default=30, help='number of epochs(default: 30)')
 parser.add_argument('--data', dest='data', default='../../data/3-fragments/fna', help='train mode (mode =0) Training and Testing data dir, eval mode (mode =1) path of test file')
-parser.add_argument('--balance_data', dest='balance_data', type=bool, default=True, help='Balance data for two classes using undersampler')
+parser.add_argument('--balance_data', dest='balance_data', type=bool, default=False, help='Balance data for two classes using undersampler')
+parser.add_argument('--sample', dest='sample', type=bool, default=False, help='sample data (500 points) to test script')
 parser.add_argument('--work_dir', dest='work_dir', default='../../work_dir', help='Training Work dir')
 parser.add_argument('--model_path', dest='model_path', default='model.h5', help='in case you are in in eval model ')
 
@@ -101,7 +102,7 @@ def load_data():
     print('Training len {0}'.format(len(df_train)))
     print('Testing len {0}'.format(len(df_test)))
 
-    if(args.balance_data):
+    if(args.sample):
         n_sample=500
         print('Sample first {0} of data'.format(n_sample))
         df_train=df_train.sample(n_sample)
