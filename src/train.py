@@ -25,7 +25,7 @@ from imblearn.under_sampling import RandomUnderSampler
 
 parser = argparse.ArgumentParser(description='VirNet a deep neural network model for virus identification')
 parser.add_argument('--mode', dest='mode',type=bool, default=False, help='if you want train mode (0) or eval mode (1) (default: 0)')
-parser.add_argument('--input_dim', dest='input_dim', type=int, default=100, help='input dim (default: 100)')
+parser.add_argument('--input_dim', dest='input_dim', type=int, default=500, help='input dim (default: 500)')
 parser.add_argument('--batch_size', dest='batch_size', type=int, default=512, help='Batch size (default: 512)')
 parser.add_argument('--cell_type', dest='model_name', default='lstm', help='model type which is lstm,gru,rnn (default: lstm)')
 parser.add_argument('--n_layers', dest='n_layers', type=int, default=1, help='number of layers(default: 1)')
@@ -49,7 +49,7 @@ data_dir=args.data
 lr=args.lr
 
 experiment_name='{0}_I{1}_L{2}_N{3}_ep{4}_lr{5}'.format(model_name,input_dim,n_layers,nn,ep,lr)
-data_file='{0}_{1}.fna_{2}.csv'
+data_file='{0}_{1}.fna_{2}.fna'
 if(args.mode):
     model_path=args.model_path
 else:
@@ -58,6 +58,8 @@ genomes=['non-viral','viral']
 logs=[]
 
 
+def create_dirs():
+    pass
 
 def load_data():
     def load_fasta(file_path):
@@ -256,8 +258,8 @@ def evaluate_model(model,X_test,y_test):
 def main():
     print('Starting Experiment {0}'.format(experiment_name))
     df_train,df_test=load_data()
-    X_train,y_train=process_data(df_train,is_sample=True)
-    X_test,y_test=process_data(df_test,is_sample=False)
+    X_train,y_train=process_data(df_train,is_sample=args.is_sample)
+    X_test,y_test=process_data(df_test,is_sample=args.is_sample)
     model=create_model(model_name,input_dim,output_dim,nn,n_layers)
     history=train_model(model,X_train,y_train)
     plot_train(history)
