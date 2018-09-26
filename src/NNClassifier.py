@@ -24,7 +24,7 @@ import numpy as np
 from AttentionLayer import AttentionWeightedAverage
 
 class NeuralClassifier(BaseEstimator, ClassifierMixin):
-    def __init__(self,attention=True,nclasses=1,nepochs = 10,type='lstm',patience = 2,batch_size = 256,embeddings = None,embed_size = 30,vocab_size = None,maxlen = 167,nlayers = 1,ngpus = 1,val_set = 0.05):
+    def __init__(self,attention=True,nclasses=1,nepochs = 20,type='lstm',patience = 5,batch_size = 256,embeddings = None,embed_size = 30,vocab_size = None,maxlen = 167,nlayers = 1,ngpus = 1,val_set = 0.05):
         """
         Called when initializing the classifier
         """

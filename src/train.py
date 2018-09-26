@@ -13,17 +13,9 @@ from contextlib import redirect_stdout
 from Bio import SeqIO
 
 
-import keras
-from keras import callbacks
-from keras import optimizers
-from keras.models import Sequential,load_model
-from keras.layers import Dense,LSTM,Dropout,GRU,RNN
-from keras.layers.embeddings import Embedding
-from sklearn.metrics import classification_report,roc_auc_score,accuracy_score
-from sklearn.metrics import roc_curve, auc
-from sklearn.utils import shuffle
+from sklearn.metrics import classification_report,roc_auc_score,accuracy_score,roc_curve, auc
 from imblearn.under_sampling import RandomUnderSampler
-
+from NNClassifier import NeuralClassifier
 
 parser = argparse.ArgumentParser(description='VirNet a deep neural network model for virus identification')
 parser.add_argument('--mode', dest='mode',type=bool, default=False, help='if you want train mode (0) or eval mode (1) (default: 0)')
@@ -81,11 +73,15 @@ def load_data():
 
         df=pd.DataFrame(data_list,columns=['ID','SEQ'])
         return df
+    
+    def clean_seq(seq):
+        return re.sub(r'[^ATGCN]','N',seq.upper())
 
     def load_csv_fragments(genome,ty,input_dim):
         data_path=os.path.join(data_dir,data_file.format(genome,ty,input_dim))
         #df=pd.read_csv(data_path)
         df=load_fasta(data_path)
+        df['SEQ']=df['SEQ'].apply(clean_seq)
         if genome == 'viral':
             df['LABEL']=1
         else:
@@ -101,10 +97,13 @@ def load_data():
 
     df_train=pd.concat(train_list)
     df_test=pd.concat(test_list)
-
+    ## SHUFFLE TRAINING DATA
+    df_train=df_train.sample(frac=1).reset_index(drop=True)
+    
     print('Training len {0}'.format(len(df_train)))
     print('Testing len {0}'.format(len(df_test)))
-
+    
+    ### JUST FOR TESTING PURPOSE
     if(args.sample):
         n_sample=500
         print('Sample first {0} of data'.format(n_sample))
@@ -113,92 +112,13 @@ def load_data():
     return df_train,df_test
 
 
-def process_data(df_train,balance_data=False):
-    print('Preporcessing and Decoding SEQ chars')
-    dna_dict={'A':1,'C':2,'G':3,'T':4,'N':5,' ':0}
-    def decode(seq):
-        new_seq=np.zeros(input_dim)
-
-        ## TODO Replace ambiguous char
-        seq=re.sub(r'[^ATGCN]','N',seq.upper())
-        for i in range(len(seq[:input_dim])):
-            new_seq[i]=dna_dict[seq[i]]
-        return new_seq.astype(np.int)
-    """    
-    dna_list=[' ','A','C','G','T','N']
-    def encode(seq):
-        new_seq=[]
-        for i in seq:
-            new_seq.append(dna_list[i])
-        return ''.join(new_seq) 
-    """
-    df_train['SEQ']=df_train['SEQ'].apply(decode)
-    X_train=df_train['SEQ'].values.tolist()
-    y_train=df_train['LABEL'].values
-
-    if(balance_data):
-        print('UnderSample Data')
-        rus = RandomUnderSampler(random_state=42)
-        rus.fit(X_train, y_train)
-        X_train, y_train = rus.sample(X_train, y_train)
-
-    print('Suffle Data')
-    X_train , y_train = shuffle(X_train, y_train, random_state=42)
-    print('Shape of Data {0}'.format(len(X_train)))
-
-    X_train=np.array(X_train).reshape(len(X_train),input_dim,1)
-    #y_train=one_hot_encode(y_train,output_dim)
-
+def under_sample_data(X_train,y_train):
+    print('UnderSample Data')
+    rus = RandomUnderSampler(random_state=42)
+    rus.fit(X_train, y_train)
+    X_train, y_train = rus.sample(X_train, y_train)
+    print('New Size {0}'.format(len(X_train)))
     return X_train,y_train
-
-
-# ## Training model
-def create_model(model_name,input_dim,output_dim,nn,n_layers):
-    print('Creating {0} Model'.format(model_name))
-    model = Sequential()
-    if model_name == 'lstm':
-        rnn_cell=LSTM
-    elif model_name == 'gru':
-        rnn_cell=GRU
-    elif model_name == 'rnn':
-        rnn_cell=RNN
-    else:
-        rnn_cell=LSTM
-
-    if(n_layers>1):
-        model.add(rnn_cell(nn,kernel_initializer='normal',input_shape=(input_dim,1),return_sequences=True,recurrent_dropout=0.1))
-        for _ in range(n_layers-2):
-                model.add(rnn_cell(nn,kernel_initializer='normal',return_sequences=True,recurrent_dropout=0.1))
-        model.add(rnn_cell(nn,kernel_initializer='normal',recurrent_dropout=0.1))
-    else:
-        model.add(rnn_cell(nn,kernel_initializer='normal',input_shape=(input_dim,1),recurrent_dropout=0.1))
-
-    model.add(Dropout(0.2))
-    model.add(Dense(nn//2,kernel_initializer='normal', activation='relu'))
-    model.add(Dropout(0.2))
-    model.add(Dense(output_dim,kernel_initializer='normal', activation='sigmoid'))
-    print(model.summary())
-    experiment_file_path=os.path.join(experiment_dir,'{0}_model_arc.txt'.format(experiment_name))
-    with open(experiment_file_path, 'w') as f:
-        with redirect_stdout(f):
-            model.summary()
-    return model
-
-def train_model(model,X_train,y_train):
-    print('Training starting ... ')
-    start_t=time.time()
-    adam=optimizers.Adam(lr=args.lr)
-    model.compile(loss='binary_crossentropy', optimizer=adam, metrics=['accuracy'])
-    checkpoint = keras.callbacks.ModelCheckpoint(filepath=model_path, monitor='val_acc', verbose=1)
-    earlystop = keras.callbacks.EarlyStopping(monitor='val_acc', min_delta=0.0001, patience=10, verbose=1)
-    history=model.fit(np.array(X_train),y_train,batch_size=args.batch_size, shuffle=True, epochs=args.ep,validation_split=0.1,verbose=2,callbacks=[checkpoint,earlystop])
-    end_t=time.time()
-    logs.append('Training time\t{0:.2f} sec\n'.format(end_t-start_t))
-    return history
-
-def load_nn_model(model,model_path):
-    model.load_weights(model_path)
-    return model
 
 def plot_train(history):
     plt.subplot(2, 1, 1)
@@ -255,7 +175,7 @@ def evaluate_model(model,X_test,y_test):
     print('Evaluate model ... ')
     start=time.time()
     target_names = ['Not Virus', 'Virus']
-    y_prop=model.predict(X_test,batch_size=1024)
+    y_prop=model.predict(X_test)
     end=time.time()
     y_pred=predict_classes(y_prop)
     logs.append(str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))+'\n')
@@ -273,10 +193,15 @@ def main():
     print('Starting Experiment {0}'.format(experiment_name))
     create_dirs()
     df_train,df_test=load_data()
-    X_train,y_train=process_data(df_train,balance_data=args.balance_data)
-    X_test,y_test=process_data(df_test)
-    model=create_model(model_name,input_dim,output_dim,args.nn,args.n_layers)
-    history=train_model(model,X_train,y_train)
+    model = NeuralClassifier()
+    #model=create_model(model_name,input_dim,output_dim,args.nn,args.n_layers)
+    X_train,X_test = model.tokenize_set(df_train['SEQ'].values,df_test['SEQ'].values)
+    y_train=df_train['LABEL'].values
+    y_test=df_test['LABEL'].values
+
+    if(args.balance_data):
+        X_train,y_train=under_sample_data(X_Train,y_train)
+    history = model.fit(X_train,y_train)
     plot_train(history)
     evaluate_model(model,X_test,y_test)
 
