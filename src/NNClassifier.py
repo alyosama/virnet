@@ -132,7 +132,7 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
             self.embeddings.set_embeddings_matrix(self.tokenizer.word_index,self.vocab_size)
 
     def tokenize(self,sentences,ngrams):
-        list_tokenized = self.tokenizer.texts_to_sequences(self.word_break(sentences))
+        list_tokenized = self.tokenizer.texts_to_sequences(self.word_break(sentences,ngrams))
         return pad_sequences(list_tokenized , maxlen=self.maxlen)
 
     def tokenize_set(self,train_sentences,test_sentences,ngrams=3): 

@@ -45,7 +45,7 @@ data_dir=args.data
 
 
 ######## FILE PATHS ##########
-experiment_name='{0}_I{1}_L{2}_N{3}_ep{4}_lr{5}'.format(model_name,input_dim,args.n_layers,args.nn,args.ep,args.lr)
+experiment_name='{0}_I{1}_L{2}'.format(model_name,input_dim,args.n_layers)
 data_file='{0}_{1}.fna_{2}.fna'
 model_dir=os.path.join(args.work_dir,'models')
 experiment_dir=os.path.join(args.work_dir,'experiments')
