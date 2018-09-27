@@ -8,7 +8,7 @@ from keras.layers.merge import Concatenate,Multiply
 from keras.layers import Bidirectional, GlobalMaxPool1D, GlobalAveragePooling1D,GlobalMaxPooling1D,concatenate,BatchNormalization,Lambda
 from keras.models import Model
 from keras.layers import merge
-from keras.layers.recurrent import LSTM
+from keras.layers.recurrent import LSTM,GRU,RNN
 #from keras.utils.training_utils import multi_gpu_model
 from keras.callbacks import ModelCheckpoint,EarlyStopping
 import tensorflow as tf
@@ -58,7 +58,12 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
         else:
             x = Embedding(self.vocab_size, self.embed_size)(inp)
         for i in range(self.nlayers):
-            x = LSTM(self.embed_size, return_sequences=True, dropout=0.1, recurrent_dropout=0.1 )(x)
+            if(self.type=='lstm'):
+                x = LSTM(self.embed_size, return_sequences=True, dropout=0.1, recurrent_dropout=0.1 )(x)
+            elif(self.type=='gru'):
+                x = GRU(self.embed_size, return_sequences=True, dropout=0.1, recurrent_dropout=0.1 )(x)
+            else:
+                x = RNN(self.embed_size, return_sequences=True, dropout=0.1, recurrent_dropout=0.1 )(x)
         if self.attention:
             x = AttentionWeightedAverage()(x)
         else:

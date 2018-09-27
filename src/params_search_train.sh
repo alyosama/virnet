@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 source activate tensorflow
 
-cell_types=("lstm" "gru" "rnn")
+cell_types=("lstm" "gru")
 n_layers=(1 2 3)
 nn=(128 256 512)
 

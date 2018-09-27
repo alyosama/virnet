@@ -23,8 +23,7 @@ parser.add_argument('--mode', dest='mode',type=bool, default=False, help='if you
 parser.add_argument('--input_dim', dest='input_dim', type=int, default=500, help='input dim (default: 500)')
 parser.add_argument('--batch_size', dest='batch_size', type=int, default=512, help='Batch size (default: 512)')
 parser.add_argument('--cell_type', dest='model_name', default='lstm', help='model type which is lstm,gru,rnn (default: lstm)')
-parser.add_argument('--n_layers', dest='n_layers', type=int, default=1, help='number of layers(default: 2)')
-parser.add_argument('--n_neurons', dest='nn', type=int, default=128, help='number of neurons(default: 128)')
+parser.add_argument('--n_layers', dest='n_layers', type=int, default=1, help='number of layers(default: 1)')
 parser.add_argument('--lr', dest='lr', type=float, default=0.01, help='learning rate(default: 0.01)')
 parser.add_argument('--epoch', dest='ep', type=int, default=30, help='number of epochs(default: 30)')
 parser.add_argument('--patience',dest='pt',type=int,default=2,help='number of declining epochs before choosing the best epoch for saving')
@@ -32,7 +31,7 @@ parser.add_argument('--embed_size',dest='embs',type=int,default=30,help='Size of
 parser.add_argument('--data', dest='data', default='../../data/3-fragments/fna', help='train mode (mode =0) Training and Testing data dir, eval mode (mode =1) path of test file')
 parser.add_argument('--ngrams', dest='ngrams', type=int, default=3, help='number of substring used in each sequence')
 parser.add_argument('--balance_data', dest='balance_data', type=bool, default=False, help='Balance data for two classes using undersampler')
-parser.add_argument('--sample', dest='sample', type=bool, default=False, help='sample data (500 points) to test script')
+parser.add_argument('--sample', dest='sample', type=int, default=-1, help='sample data (n=500 points) to test script')
 parser.add_argument('--work_dir', dest='work_dir', default='../../work_dir', help='Training Work dir')
 parser.add_argument('--model_path', dest='model_path', default='model.h5', help='in case you are in in eval model ')
 
@@ -107,12 +106,11 @@ def load_data():
     print('Training len {0}'.format(len(df_train)))
     print('Testing len {0}'.format(len(df_test)))
     
-    ### JUST FOR TESTING PURPOSE
-    if(args.sample):
-        n_sample=500
-        print('Sample first {0} of data'.format(n_sample))
-        df_train=df_train.sample(n_sample)
-        df_test=df_test.sample(n_sample)
+    ### JUST FOR TESTING or HYPERPARAMS OPTIMIZATION
+    if(args.sample>0):
+        print('Sample first {0} of data'.format(args.sample))
+        df_train=df_train.sample(args.sample,random_state=42)
+        df_test=df_test.sample(args.sample,random_state=42)
     return df_train,df_test
 
 
@@ -197,16 +195,17 @@ def main():
     print('Starting Experiment {0}'.format(experiment_name))
     create_dirs()
     df_train,df_test=load_data()
-    model = NeuralClassifier(nepochs=args.ep,patience=args.pt,\
-        batch_size=args.batch_size,embed_size=args.embs,\
+    model = NeuralClassifier(type=args.model_name, nepochs=args.ep, patience=args.pt,\
+        batch_size=args.batch_size, embed_size=args.embs,\
         nlayers=args.n_layers,maxlen = int(math.ceil(args.input_dim *1.0 / args.ngrams)))
-    #model=create_model(model_name,input_dim,output_dim,args.nn,args.n_layers)
+
     X_train,X_test = model.tokenize_set(df_train['SEQ'].values,df_test['SEQ'].values,ngrams=args.ngrams)
     y_train=df_train['LABEL'].values
     y_test=df_test['LABEL'].values
 
     if(args.balance_data):
-        X_train,y_train=under_sample_data(X_Train,y_train)
+        X_train,y_train=under_sample_data(X_train,y_train)
+
     history = model.fit(X_train,y_train)
     plot_train(history)
     evaluate_model(model,X_test,y_test)
