@@ -106,19 +106,19 @@ def load_data():
     print('Training len {0}'.format(len(df_train)))
     print('Testing len {0}'.format(len(df_test)))
     
-    ### JUST FOR TESTING or HYPERPARAMS OPTIMIZATION
-    if(args.sample>0):
-        print('Sample first {0} of data'.format(args.sample))
-        df_train=df_train.sample(args.sample,random_state=42)
-        df_test=df_test.sample(args.sample,random_state=42)
     return df_train,df_test
 
+### JUST FOR TESTING or HYPERPARAMS OPTIMIZATION
+def sample_data(df,n_sample):
+    print('Sample first {0} of data'.format(n_sample))
+    return df.sample(n_sample,random_state=42)
 
-def under_sample_data(X_train,y_train):
-    print('UnderSample Data')
+def balance_classes(X_train,y_train):
+    print('UnderSample Data - Balance Classes')
     rus = RandomUnderSampler(random_state=42)
     rus.fit(X_train, y_train)
     X_train, y_train = rus.sample(X_train, y_train)
+
     print('New Size {0}'.format(len(X_train)))
     return X_train,y_train
 
@@ -199,12 +199,16 @@ def main():
         batch_size=args.batch_size, embed_size=args.embs,\
         nlayers=args.n_layers,maxlen = int(math.ceil(args.input_dim *1.0 / args.ngrams)))
 
+    if(args.sample>0):
+        df_train=sample_data(df_train,args.sample)
+        df_test=sample_data(df_test,args.sample//5)
+
     X_train,X_test = model.tokenize_set(df_train['SEQ'].values,df_test['SEQ'].values,ngrams=args.ngrams)
     y_train=df_train['LABEL'].values
     y_test=df_test['LABEL'].values
 
     if(args.balance_data):
-        X_train,y_train=under_sample_data(X_train,y_train)
+        X_train,y_train=balance_classes(X_train,y_train)
 
     history = model.fit(X_train,y_train)
     plot_train(history)
