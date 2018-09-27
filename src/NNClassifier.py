@@ -110,28 +110,28 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
         else:
             return roc_auc_score(y,self.model.predict(X))
     
-    def word_break(self,sentences,ngrams=3):
+    def word_break(self,sentences,ngrams):
         if ngrams==0:
             return sentences
         result = [ re.sub(r'(.{'+str(ngrams)+'})',r'\1 ',sent).strip() for sent in sentences]
         return result
       
-    def tokenize_train(self,train_sentences):
+    def tokenize_train(self,train_sentences,ngrams):
         if self.vocab_size is not None:
             self.tokenizer = Tokenizer(num_words=self.vocab_size,char_level=False)
         else:
             self.tokenizer = Tokenizer(char_level=False)
-        self.tokenizer.fit_on_texts(self.word_break(train_sentences))
+        self.tokenizer.fit_on_texts(self.word_break(train_sentences,ngrams))
         self.vocab_size = len(self.tokenizer.word_index)
         if self.embeddings is not None:
             self.embeddings.set_embeddings_matrix(self.tokenizer.word_index,self.vocab_size)
 
-    def tokenize(self,sentences):
+    def tokenize(self,sentences,ngrams):
         list_tokenized = self.tokenizer.texts_to_sequences(self.word_break(sentences))
         return pad_sequences(list_tokenized , maxlen=self.maxlen)
 
-    def tokenize_set(self,train_sentences,test_sentences): 
-        self.tokenize_train(list(train_sentences)+list(test_sentences))
-        X_t =self.tokenize(list(train_sentences))
-        X_te = self.tokenize(list(test_sentences))
+    def tokenize_set(self,train_sentences,test_sentences,ngrams=3): 
+        self.tokenize_train(list(train_sentences)+list(test_sentences),ngrams)
+        X_t =self.tokenize(list(train_sentences),ngrams)
+        X_te = self.tokenize(list(test_sentences),ngrams)
         return X_t,X_te
