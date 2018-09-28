@@ -158,9 +158,19 @@ Embedding Layer maps discrete input words to dense vectors for computational eff
 The attentional network could learn how to extract suitable features from the raw data, and can attend to previous DNA nucleotide within the same input sequence. 
 
 Recurrent neural networks (RNN), long short-term memory (LSTM) \cite{hochreiter1997long} and gated recurrent neural networks (GRU) \cite{chung2014empirical} can model complex sequences and have been used for sequence modeling problems. All these variations were used during to get the performing model over the input fragments. 
-LSTM encoder have 3 gates to protect and control the cell state as in \ref{fig:lstm},the input gate which defines how much of the newly computed state you want to let through, forget gate that decides what information is to be kept and what is to be thrown away and the the output of the update gate hat's used to update the cell state.
 
-GRU encoder is same as LSTM except it has only 2 gates, Reset gate that determines how to combine the new input with the previously saved input state and the update gate that defines the amount of information too keep around. The few number of gates makes it faster than the LSTM cell and based on the data might have better performance. In our model after validating various type of models the GRU attentional model performed well on the input DNA nucleotide.
+LSTM encoder have 3 gates to protect and control the cell state as in \ref{fig:lstm_gru},the input gate denoted $\mathbf{i}$ which defines how much of the newly computed state you want to let through, forget gate denoted $\mathbf{f}$ that decides what information is to be kept and what is to be thrown away ,  the output of the update gate denoted $\mathbf{U}$ that's used to update the cell state and the output of the LSTM cell $\mathbf{o}$ .$\mathbf{W}$ is the recurrent connection at the previous hidden layer and current hidden layer and $\mathbf{C}$ is the internal memory of the unit  as shown in the following equations \newline
+$\mathbf{i_{t}=\sigma(x_{t}U^i + h_{t-1}W^i)}$ \newline
+$\mathbf{f_{t}=\sigma(x_{t}U^f + h_{t-1}W^f)}$ \newline
+$\mathbf{o_{t}=\sigma(x_{t}U^o + h_{t-1}W^o)}$. 
+
+GRU encoder \ref{fig:lstm_gru} is same as LSTM except it has only 2 gates, Reset gate denoted $\mathbf{r}$ that determines how to combine the new input with the previously saved input state and the update gate denoted $\mathbf{z}$ that defines the amount of information to keep around, as defined  in the following equations \newline
+$\mathbf{z_{t}=\sigma(x_{t}U^z + h_{t-1}W^z)}$ \newline
+$\mathbf{r_{t}=\sigma(x_{t}U^r + h_{t-1}W^r)}$ \newline
+$\mathbf{\overline{h_{t}} = tanh(x_{t}U^h + (r_{t} * h_{t-1})W^h )}$ \newline
+$\mathbf{ h_{t} = (1-z_{t})*h_{t-1} +z_{t}*\overline{h_{t}}}$.
+
+The few number of gates in GRU makes it faster than the LSTM cell and based on the data might have better performance. In our model after validating various type of models the GRU attentional model performed well on the input DNA nucleotide.
 
  
  The attentional neural model \ref{fig:model_diagram} was trained with the DNA nucleotide bases with 100bp fragments.The model will then try to predict in a binary format whether this fragment is viral or non-viral.
@@ -185,9 +195,9 @@ During training all parameters are optimized jointly using Adam to maximize the 
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.8\columnwidth]{imgs/lstm.PNG}
-	\caption{LSTM encoder}
-	\label{fig:lstm}
+	\includegraphics[width=1\columnwidth]{imgs/lstm_and_gru.PNG}
+	\caption{LSTM and GRU encoders}
+	\label{fig:lstm_gru}
 \end{figure}
 
 \begin{figure}
