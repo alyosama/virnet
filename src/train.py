@@ -183,12 +183,6 @@ def main():
     print('Starting Experiment {0}'.format(experiment_name))
     create_dirs()
 
-    # Create Model
-    print('Loading Model')
-    model = NeuralClassifier(exp_name=experiment_name, type=args.model_name, nepochs=args.ep, patience=args.pt, l_rate=args.lr,\
-    batch_size=args.batch_size, embed_size=args.embs,\
-    nlayers=args.n_layers, maxlen = int(math.ceil(args.input_dim * 1.0 / args.ngrams)))
-
     # Load Data
     df_train,df_test=load_data()
     if(args.sample>0):
@@ -196,6 +190,14 @@ def main():
         df_train=sample_data(df_train,args.sample)
         df_test=sample_data(df_test,int(args.sample*TEST_RATIO))
 
+
+    # Create Model
+    print('Loading Model')
+    model = NeuralClassifier(exp_name=experiment_name, type=args.model_name, nepochs=args.ep, patience=args.pt, l_rate=args.lr,\
+    batch_size=args.batch_size, embed_size=args.embs,\
+    nlayers=args.n_layers, maxlen = int(math.ceil(args.input_dim * 1.0 / args.ngrams)))
+
+    # Prepare data
     X_train,X_test = model.tokenize_set(df_train['SEQ'].values,df_test['SEQ'].values,ngrams=args.ngrams)
     y_train=df_train['LABEL'].values
     y_test=df_test['LABEL'].values
@@ -206,6 +208,7 @@ def main():
     n_viruses=len(y_train[y_train==1])
     n_pro=len(y_train[y_train==0])
     print('Viruses {0}\t Non Viruses {1}'.format(n_viruses,n_pro))
+
 
     # Train
     history = model.fit(X_train,y_train)
