@@ -24,7 +24,7 @@ import numpy as np
 from AttentionLayer import AttentionWeightedAverage
 
 class NeuralClassifier(BaseEstimator, ClassifierMixin):
-    def __init__(self,attention=True,nclasses=1,nepochs = 20,type='lstm',patience = 5,batch_size = 256,embeddings = None,embed_size = 30,vocab_size = None,maxlen = 167,nlayers = 1,ngpus = 1,val_set = 0.05):
+    def __init__(self,exp_name='experiment',attention=True,nclasses=1,nepochs = 20,type='lstm',patience = 5,batch_size = 512 ,embeddings = None, embed_size = 32,vocab_size = None,maxlen = 167,nlayers = 1,ngpus = 1,val_set = 0.05):
         """
         Called when initializing the classifier
         """
@@ -33,7 +33,7 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
         self.nclasses = nclasses
         self.nepochs = nepochs
         self.batch_size = batch_size
-        self.file_path="../../work_dir/models/weights_base.best.hdf5"
+        self.file_path="../../work_dir/models/"+exp_name+"-{val_loss:.2f}.h5"
         self.val_size = val_set
         self.model = None
         self.embeddings = embeddings 
@@ -91,13 +91,11 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
         """
         checkpoint = ModelCheckpoint(self.file_path, monitor='val_loss', verbose=1, save_best_only=True,save_weights_only = True, mode='min')
         early = EarlyStopping(monitor="val_loss", mode="min", patience=self.patience)
-        train = X
-        train_label = y
         self.callbacks_list = [early,checkpoint] #early
         self.model = self.lstm_model()
         if self.val_size==0:
             self.callbacks_list = []
-        history = self.model.fit(train, train_label, batch_size=self.batch_size, epochs=self.nepochs, validation_split=self.val_size,callbacks =self.callbacks_list ,shuffle=True)
+        history = self.model.fit(X, y, batch_size=self.batch_size, epochs=self.nepochs, validation_split=self.val_size, callbacks = self.callbacks_list ,shuffle=True, verbose=2)
         return history
 
 
@@ -108,12 +106,9 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
     def predict_proba(self, X):
         return self.predict(X)
 
-    def score(self, X=None, y=None):
+    def score(self, X, y):
         # counts number of values bigger than mean
-        if X is None and y is None:
-            return roc_auc_score(self.val_label,self.model.predict(self.val))
-        else:
-            return roc_auc_score(y,self.model.predict(X))
+        return roc_auc_score(y,self.model.predict(X))
     
     def word_break(self,sentences,ngrams):
         if ngrams==0:

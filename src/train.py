@@ -1,6 +1,5 @@
 import os
 import re
-import gzip
 import random
 import datetime
 import math
@@ -10,30 +9,26 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
-from contextlib import redirect_stdout
 from Bio import SeqIO
-
 
 from sklearn.metrics import classification_report,roc_auc_score,accuracy_score,roc_curve, auc
 from imblearn.under_sampling import RandomUnderSampler
 from NNClassifier import NeuralClassifier
 
 parser = argparse.ArgumentParser(description='VirNet a deep neural network model for virus identification')
-parser.add_argument('--mode', dest='mode',type=bool, default=False, help='if you want train mode (0) or eval mode (1) (default: 0)')
 parser.add_argument('--input_dim', dest='input_dim', type=int, default=500, help='input dim (default: 500)')
-parser.add_argument('--batch_size', dest='batch_size', type=int, default=512, help='Batch size (default: 512)')
 parser.add_argument('--cell_type', dest='model_name', default='lstm', help='model type which is lstm,gru,rnn (default: lstm)')
+parser.add_argument('--batch_size', dest='batch_size', type=int, default=512, help='Batch size (default: 512)')
 parser.add_argument('--n_layers', dest='n_layers', type=int, default=1, help='number of layers(default: 1)')
 parser.add_argument('--lr', dest='lr', type=float, default=0.01, help='learning rate(default: 0.01)')
 parser.add_argument('--epoch', dest='ep', type=int, default=30, help='number of epochs(default: 30)')
-parser.add_argument('--patience',dest='pt',type=int,default=2,help='number of declining epochs before choosing the best epoch for saving')
-parser.add_argument('--embed_size',dest='embs',type=int,default=30,help='Size of Embedding layer of input tokens')
-parser.add_argument('--data', dest='data', default='../../data/3-fragments/fna', help='train mode (mode =0) Training and Testing data dir, eval mode (mode =1) path of test file')
+parser.add_argument('--patience',dest='pt',type=int, default=3, help='number of declining epochs before choosing the best epoch for saving')
+parser.add_argument('--embed_size',dest='embs',type=int, default=32,help='Size of Embedding layer of input tokens (32)')
 parser.add_argument('--ngrams', dest='ngrams', type=int, default=3, help='number of substring used in each sequence')
-parser.add_argument('--balance_data', dest='balance_data', type=bool, default=False, help='Balance data for two classes using undersampler')
+parser.add_argument('--balance_data', dest='balance_data', type=bool, default=True, help='Balance data for two classes using undersampler')
 parser.add_argument('--sample', dest='sample', type=int, default=-1, help='sample data (n=500 points) to test script')
+parser.add_argument('--data', dest='data', default='../../data/3-fragments/fna', help='train mode  Training and Testing data dir')
 parser.add_argument('--work_dir', dest='work_dir', default='../../work_dir', help='Training Work dir')
-parser.add_argument('--model_path', dest='model_path', default='model.h5', help='in case you are in in eval model ')
 
 ######### PARAMS #############
 args = parser.parse_args()
@@ -47,12 +42,7 @@ data_dir=args.data
 ######## FILE PATHS ##########
 experiment_name='{0}_I{1}_L{2}'.format(model_name,input_dim,args.n_layers)
 data_file='{0}_{1}.fna_{2}.fna'
-model_dir=os.path.join(args.work_dir,'models')
 experiment_dir=os.path.join(args.work_dir,'experiments')
-if(args.mode):
-    model_path=args.model_path
-else:
-    model_path=os.path.join(model_dir,'model_'+experiment_name+'{epoch:02d}-{val_acc:.2f}.h5')
 experiment_curve_file_path=os.path.join(experiment_dir,'{0}_roc_curve.png'.format(experiment_name))
 experiment_logs_file_path=os.path.join(experiment_dir,'{0}_logs.txt'.format(experiment_name))
 experiment_traincurve_file_path=os.path.join(experiment_dir,'{0}_train_curve.png'.format(experiment_name))
@@ -60,10 +50,7 @@ experiment_logits_file_path=os.path.join(experiment_dir,'{0}_logits.h5'.format(e
 
 
 ############ HELPER FUNCTIONS ############
-logs=[]
 def create_dirs():
-    if not os.path.exists(model_dir):
-        os.makedirs(model_dir)
     if not os.path.exists(experiment_dir):
         os.makedirs(experiment_dir)
 
@@ -100,9 +87,9 @@ def load_data():
 
     df_train=pd.concat(train_list)
     df_test=pd.concat(test_list)
+
     ## SHUFFLE TRAINING DATA
-    df_train=df_train.sample(frac=1).reset_index(drop=True)
-    
+    df_train=df_train.sample(frac=1).reset_index(drop=True)  
     print('Training len {0}'.format(len(df_train)))
     print('Testing len {0}'.format(len(df_test)))
     
@@ -175,6 +162,7 @@ def predict_classes(proba):
 
 def evaluate_model(model,X_test,y_test):
     print('Evaluate model ... ')
+    logs=[]
     start=time.time()
     target_names = ['Not Virus', 'Virus']
     y_prop=model.predict(X_test)
@@ -194,14 +182,19 @@ def evaluate_model(model,X_test,y_test):
 def main():
     print('Starting Experiment {0}'.format(experiment_name))
     create_dirs()
-    df_train,df_test=load_data()
-    model = NeuralClassifier(type=args.model_name, nepochs=args.ep, patience=args.pt,\
-        batch_size=args.batch_size, embed_size=args.embs,\
-        nlayers=args.n_layers,maxlen = int(math.ceil(args.input_dim *1.0 / args.ngrams)))
 
+    # Create Model
+    print('Loading Model')
+    model = NeuralClassifier(exp_name=experiment_name, type=args.model_name, nepochs=args.ep, patience=args.pt,\
+    batch_size=args.batch_size, embed_size=args.embs,\
+    nlayers=args.n_layers, maxlen = int(math.ceil(args.input_dim * 1.0 / args.ngrams)))
+
+    # Load Data
+    df_train,df_test=load_data()
     if(args.sample>0):
+        TEST_RATIO=0.2
         df_train=sample_data(df_train,args.sample)
-        df_test=sample_data(df_test,args.sample//5)
+        df_test=sample_data(df_test,int(args.sample*TEST_RATIO))
 
     X_train,X_test = model.tokenize_set(df_train['SEQ'].values,df_test['SEQ'].values,ngrams=args.ngrams)
     y_train=df_train['LABEL'].values
@@ -209,9 +202,14 @@ def main():
 
     if(args.balance_data):
         X_train,y_train=balance_classes(X_train,y_train)
-
+    
+    # Train
     history = model.fit(X_train,y_train)
+
+    # Plot History
     plot_train(history)
+
+    #Evaluate
     evaluate_model(model,X_test,y_test)
 
 if __name__ == "__main__":
