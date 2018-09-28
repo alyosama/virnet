@@ -22,6 +22,12 @@
 Cairo, Egypt \\
 aly.osama@eng.asu.edu.eg}
 \and
+\IEEEauthorblockN{Mostafa Elaraby}
+\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
+\textit{Alexandria University}\\
+Cairo, Egypt \\
+mostafa.m.elaraby@gmail.com}
+\and
 \IEEEauthorblockN{Mahmoud I. Khalil}
 \IEEEauthorblockA{\textit{Department of Computer Engineering} \\
 \textit{Ain Shams University}\\
@@ -144,16 +150,22 @@ Then, we applied our tool to two real metagenomes as a case study
 Our tool is able to read not only fasta files and fastq files. Furthermore, it is able to deal with paired-end reads i.e. if one of the two pairs is identified as a virus, the other should be the same. If there are conflicts between the classifications of the two pairs; this pair could be denoted as ambiguous.
 
 \section{Deep Learning Model}
-The Deep Learning system is implemented as an attentional encoder network. An input sequence  $\mathbf{x = (x_{1} , \ldots{} , x_{m} )}$  and calculates a forward sequence of hidden states  ($\mathbf{\overrightarrow{h_{1}}}$,\ldots{},$\mathbf{ \overrightarrow{h_{m}}}$). The hidden states $\mathbf{\overrightarrow{h_{j}}}$  are averaged to obtain the attention vector $\mathbf{h_{j}}$ representing the context vector from the input sequence.
+The Deep Learning system is implemented as an attentional encoder network  \ref{fig:encoder}. An input sequence  $\mathbf{x = (x_{1} , \ldots{} , x_{m} )}$  and calculates a forward sequence of hidden states  ($\mathbf{\overrightarrow{h_{1}}}$,\ldots{},$\mathbf{ \overrightarrow{h_{m}}}$). The hidden states $\mathbf{\overrightarrow{h_{j}}}$  are averaged to obtain the attention vector $\mathbf{h_{j}}$ representing the context vector from the input sequence.
+
+Embedding Layer maps discrete input words to dense vectors for computational efficiency before feeding this sequence to LSTM/GRU Layers.
+
 
 The attentional network could learn how to extract suitable features from the raw data, and can attend to previous DNA nucleotide within the same input sequence. 
 
 Recurrent neural networks (RNN), long short-term memory (LSTM) \cite{hochreiter1997long} and gated recurrent neural networks (GRU) \cite{chung2014empirical} can model complex sequences and have been used for sequence modeling problems. All these variations were used during to get the performing model over the input fragments. 
+LSTM encoder have 3 gates to protect and control the cell state as in \ref{fig:lstm},the input gate which defines how much of the newly computed state you want to let through, forget gate that decides what information is to be kept and what is to be thrown away and the the output of the update gate hat's used to update the cell state.
 
+GRU encoder is same as LSTM except it has only 2 gates, Reset gate that determines how to combine the new input with the previously saved input state and the update gate that defines the amount of information too keep around. The few number of gates makes it faster than the LSTM cell and based on the data might have better performance. In our model after validating various type of models the GRU attentional model performed well on the input DNA nucleotide.
 
+ 
  The attentional neural model \ref{fig:model_diagram} was trained with the DNA nucleotide bases with 100bp fragments.The model will then try to predict in a binary format whether this fragment is viral or non-viral.
  
-The model consists of an input embedding layer of size 128 mapping input DNA nucleotide tokens into an embedding space , that's fed to an LSTM layer.The forward sequence $\mathbf{\overrightarrow{h_{j}}}$ is then averaged togethor to create an attentional vector representing token context within the same fragment.A dropout layer was added after the attentional layer to avoid overfitting over the input data.
+The top performing model consists of an input embedding layer of size 128 mapping input DNA nucleotide tokens into an embedding space , that's fed to a GRU layer.The forward sequence $\mathbf{\overrightarrow{h_{j}}}$ is then averaged togethor to create an attentional vector representing token context within the same fragment.A dropout layer was added after the attentional layer to avoid overfitting over the input data.
 
 The input sequence is divided into 5 grams sized tokens these tokens are then treated as single word .This single token is mapped as a point in the embedding space created during training the neural model.
 
@@ -162,6 +174,21 @@ During training all parameters are optimized jointly using Adam to maximize the 
  In this model , an early stopping mechanism was used as a form of regularization to avoid overfitting over the data while making more epochs over the data. The early stopping mechanism was used with patience of 3 non  improving consecutive epochs , the neural model will stop training while saving the latest improving checkpoint over the validation set defined.
 
 
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\columnwidth]{imgs/encoder.PNG}
+	\caption{Embedding Layer}
+	\label{fig:encoder}
+\end{figure}
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\columnwidth]{imgs/lstm.PNG}
+	\caption{LSTM encoder}
+	\label{fig:lstm}
+\end{figure}
 
 \begin{figure}
 	\centering
