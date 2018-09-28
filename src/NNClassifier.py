@@ -24,7 +24,7 @@ import numpy as np
 from AttentionLayer import AttentionWeightedAverage
 
 class NeuralClassifier(BaseEstimator, ClassifierMixin):
-    def __init__(self,exp_name='experiment',attention=True,nclasses=1,nepochs = 20,type='lstm',patience = 5,batch_size = 512 ,embeddings = None, embed_size = 32,vocab_size = None,maxlen = 167,nlayers = 1,ngpus = 1,val_set = 0.05):
+    def __init__(self,exp_name='experiment',attention=True,nclasses=1,nepochs = 20,type='lstm',patience = 5,batch_size = 256 ,embeddings = None, embed_size = 32,vocab_size = None,maxlen = 167,nlayers = 1,ngpus = 1,val_set = 0.1, l_rate=0.001):
         """
         Called when initializing the classifier
         """
@@ -33,6 +33,7 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
         self.nclasses = nclasses
         self.nepochs = nepochs
         self.batch_size = batch_size
+        self.l_rate=l_rate
         self.file_path="../../work_dir/models/"+exp_name+"-{val_loss:.2f}.h5"
         self.val_size = val_set
         self.model = None
@@ -78,7 +79,7 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
         else:
             model = Model(inputs=inp, outputs=x)
             
-        adam=optimizers.Adam()
+        adam=optimizers.Adam(lr=self.l_rate)
         model.compile(loss='binary_crossentropy', optimizer=adam, metrics=['accuracy'])
         return model
 

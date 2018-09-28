@@ -18,15 +18,15 @@ from NNClassifier import NeuralClassifier
 parser = argparse.ArgumentParser(description='VirNet a deep neural network model for virus identification')
 parser.add_argument('--input_dim', dest='input_dim', type=int, default=500, help='input dim (default: 500)')
 parser.add_argument('--cell_type', dest='model_name', default='lstm', help='model type which is lstm,gru,rnn (default: lstm)')
-parser.add_argument('--batch_size', dest='batch_size', type=int, default=512, help='Batch size (default: 512)')
+parser.add_argument('--batch_size', dest='batch_size', type=int, default=256, help='Batch size (default: 256)')
 parser.add_argument('--n_layers', dest='n_layers', type=int, default=1, help='number of layers(default: 1)')
-parser.add_argument('--lr', dest='lr', type=float, default=0.01, help='learning rate(default: 0.01)')
+parser.add_argument('--lr', dest='lr', type=float, default=0.001, help='learning rate(default: 0.001)')
 parser.add_argument('--epoch', dest='ep', type=int, default=30, help='number of epochs(default: 30)')
-parser.add_argument('--patience',dest='pt',type=int, default=3, help='number of declining epochs before choosing the best epoch for saving')
+parser.add_argument('--patience',dest='pt',type=int, default=5, help='number of declining epochs before choosing the best epoch for saving')
 parser.add_argument('--embed_size',dest='embs',type=int, default=32,help='Size of Embedding layer of input tokens (32)')
-parser.add_argument('--ngrams', dest='ngrams', type=int, default=3, help='number of substring used in each sequence')
-parser.add_argument('--balance_data', dest='balance_data', type=bool, default=True, help='Balance data for two classes using undersampler')
-parser.add_argument('--sample', dest='sample', type=int, default=-1, help='sample data (n=500 points) to test script')
+parser.add_argument('--ngrams', dest='ngrams', type=int, default=3, help='number of substring used in each sequence (3) ')
+parser.add_argument('--balance_data', dest='balance_data', type=bool, default=True, help='Balance data for two classes using undersampler (True) ')
+parser.add_argument('--sample', dest='sample', type=int, default=-1, help='sample data (n=500 points) to test script (-1) ')
 parser.add_argument('--data', dest='data', default='../../data/3-fragments/fna', help='train mode  Training and Testing data dir')
 parser.add_argument('--work_dir', dest='work_dir', default='../../work_dir', help='Training Work dir')
 
@@ -97,7 +97,7 @@ def load_data():
 
 ### JUST FOR TESTING or HYPERPARAMS OPTIMIZATION
 def sample_data(df,n_sample):
-    print('Sample first {0} of data'.format(n_sample))
+    print('Sampling {0} of data'.format(n_sample))
     return df.sample(n_sample,random_state=42)
 
 def balance_classes(X_train,y_train):
@@ -106,7 +106,7 @@ def balance_classes(X_train,y_train):
     rus.fit(X_train, y_train)
     X_train, y_train = rus.sample(X_train, y_train)
 
-    print('New Size {0}'.format(len(X_train)))
+    print('After Balancing the new size is {0}'.format(len(X_train)))
     return X_train,y_train
 
 def plot_train(history):
@@ -185,7 +185,7 @@ def main():
 
     # Create Model
     print('Loading Model')
-    model = NeuralClassifier(exp_name=experiment_name, type=args.model_name, nepochs=args.ep, patience=args.pt,\
+    model = NeuralClassifier(exp_name=experiment_name, type=args.model_name, nepochs=args.ep, patience=args.pt, l_rate=args.lr,\
     batch_size=args.batch_size, embed_size=args.embs,\
     nlayers=args.n_layers, maxlen = int(math.ceil(args.input_dim * 1.0 / args.ngrams)))
 
@@ -203,6 +203,10 @@ def main():
     if(args.balance_data):
         X_train,y_train=balance_classes(X_train,y_train)
     
+    n_viruses=len(y_train[y_train==1])
+    n_pro=len(y_train[y_train==0])
+    print('Viruses {0}\t Non Viruses {1}'.format(n_viruses,n_pro))
+
     # Train
     history = model.fit(X_train,y_train)
 
