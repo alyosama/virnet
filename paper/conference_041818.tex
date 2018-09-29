@@ -170,8 +170,7 @@ $\mathbf{r_{t}=\sigma(x_{t}U^r + h_{t-1}W^r)}$ \newline
 $\mathbf{\overline{h_{t}} = tanh(x_{t}U^h + (r_{t} * h_{t-1})W^h )}$ \newline
 $\mathbf{ h_{t} = (1-z_{t})*h_{t-1} +z_{t}*\overline{h_{t}}}$.
 
-The few number of gates in GRU makes it faster than the LSTM cell and based on the data might have better performance. In our model after validating various type of models the GRU attentional model performed well on the input DNA nucleotide.
-
+The few number of gates in GRU makes it faster to converge than the LSTM on moderate data size.After trying both on this data , LSTM was outperforming the GRU model which was expected depending on the input data size.
  
  The attentional neural model \ref{fig:model_diagram} was trained with the DNA nucleotide bases with 100bp fragments.The model will then try to predict in a binary format whether this fragment is viral or non-viral.
  
