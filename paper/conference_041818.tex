@@ -49,19 +49,21 @@ hazem.abbas@eng.asu.edu.eg}
 
 \maketitle
 
-\begin{abstract}\\Metagenomics shows a promising understanding of function and diversity of the microbial communities due to the difficulty of studying microorganism with a pure culture isolation. Moreover, the viral identification is considered one of the most important steps in studying microbial communities. Several studies show different methods to identify viruses in mixed metagenomic data and phages in host genomes using homology and statistical techniques. These techniques have many limitations due to viral genome diversity. In this work, we propose a sequence deep model for viral identification of metagenomic data.\\
-\textbf{Results:} To test this method, we generate fragments of viruses and bacteria from RefSeq genomes with different lengths to find the best hyperparameters of our model. Then, We simulated both microbiome and virome high throughput data from our test-set genomes in order to validate our method. Finally, we applied our tool on a case study of two types of metagenomic data such as Roche 454 and Illumina. We found our sequence model reached 85.12\% of accuracy whereas VirFinder tool obtained 75.61\% with the same training and testing data.\\
-\textbf{Conclusion:} We developed the first deep sequence network based on viral identification in large data. This tool will help us in expanding our knowledge in natural viral communities.
+\begin{abstract}\\Metagenomics shows a promising understanding of function and diversity of the microbial communities due to the difficulty of studying microorganism with a pure culture isolation. Moreover, the viral identification is considered one of the most important steps in studying microbial communities. Several studies show different methods to identify viruses in mixed metagenomic data and phages in host genomes, using homology and statistical techniques. These techniques have many limitations due to viral genome diversity. In this work, we propose a sequence deep neural model for viral identification of metagenomic data. For testing purpose, we generated fragments of viruses and bacteria from RefSeq genomes with different lengths to find the best hyperparameters of our model. Then, we simulated both microbiome and virome high throughput data from our test-set genomes in order to validate our method. Finally, we applied our tool on a case study of two types of metagenomic data such as Roche 454 and Illumina. We compared our tool to the state-of-the art statistical tool and found it performed much better in terms of accuracy and speed on the same testing data. This tool will help us in growing our insights in natural viruses of microbial communities.
 \end{abstract}
 
 \begin{IEEEkeywords}
- Metagenomics, Deep Learning, Viruses, LSTM, Classification 
+metagenomics, deep learning, viruses, sequence model, classification 
 \end{IEEEkeywords}
 
 
 \section{Introduction}
 
-Metagenomics is the cultivation-independent analysis of the genetic information of the collective genomes of the microbes within a given environment based on its sampling \cite{izard2014metagenomics}. There is a small fraction of extant microbial life has been identified because of the difficulty to study microbiology with a pure culture isolation. Scientist reported that there are less than 5\% of microorganisms can be easily cultured(Need a reference). Metagenomic analysis process demonstrates a promising understanding of different microorganisms. It answers some questions about microorganisms in the collection such as Who is there?, What can they do? and what can they potentially do?.
+Metagenomics is the cultivation-independent analysis of the genetic information of the collective genomes of the microbes within a given environment based on its sampling \cite{izard2014metagenomics}. There is little portion of microbial organisms identified due to the difficulty in studying them using a pure culture isolation. Scientist reported that there are less than 5\% of microorganisms can be easily cultured (Need a reference).
+% https://www.the-scientist.com/daily-news/most-gut-microbes-can-be-cultured-33581
+Metagenomic analysis process demonstrates a promising understanding of different microorganisms. It answers some questions about microorganisms in the collection such as Who is there?, What can they do? and what can they potentially do?.
+
+
 
 Microorganisms are found everywhere on earth and they are very important in our life. They are essential to our life. In this study, our interest is in Prokaryotic Microorganisms
 (e.g. Bacteria and Archaea) and viruses. Bacteria are unicellular and microscopic organisms that reproduce by binary fission. On the other hand, viruses are typically submicroscopic consists of genetic materials either(DNA or RNA) surrounded by a protective coat of proteins and can only replicate inside living host cells. 
@@ -181,7 +183,7 @@ The input sequence is divided into 5 grams sized tokens these tokens are then tr
 
 During training all parameters are optimized jointly using Adam to maximize the conditional probability of tokens found together to predict if an input sequence is viral or not.
 
- In this model , an early stopping mechanism was used as a form of regularization to avoid overfitting over the data while making more epochs over the data. The early stopping mechanism was used with patience of 3 non  improving consecutive epochs , the neural model will stop training while saving the latest improving checkpoint over the validation set defined.
+ In this model , an early stopping mechanism was used as a form of regularization to avoid overfitting over the data while making more epochs over the data. The early stopping mechanism was used with patience of 3 non  improving consecutive epochs , the neural model will stop training while saving the latest improving checkpoint over the validation set defined. 
 
 
 
