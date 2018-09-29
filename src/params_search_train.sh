@@ -3,7 +3,7 @@ source activate tensorflow
 
 cell_types=("lstm" "gru" "rnn")
 n_layers=(1 2 3)
-embed_sizes=(32 64 128)
+embed_sizes=(64 128 256)
 ngrams=(3 5 7)
 
 for cell_type in ${cell_types[@]}; do
