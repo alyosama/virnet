@@ -12,39 +12,41 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{\line(1,0){250}\\VirNet: Sequence model for viral identification\\ \line(1,0){250}}
-
+\title{\LARGE \bf VirNet: Sequence model for viral identification}
 
 \author{
-\IEEEauthorblockN{Aly O. Abdelkareem}
-\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
-\textit{Ain Shams University}\\
-Cairo, Egypt \\
-aly.osama@eng.asu.edu.eg}
-\and
-\IEEEauthorblockN{Mostafa Elaraby}
-\IEEEauthorblockA{\textit{Microsoft Research}\\
-	Cairo, Egypt \\
-	a-moelar@microsoft.com}
-\and
-\IEEEauthorblockN{Mahmoud I. Khalil}
-\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
-\textit{Ain Shams University}\\
-Cairo, Egypt \\
-mahmoud.khalil@eng.asu.edu.eg}
-\and
-\IEEEauthorblockN{Hazem M. Abbas}
-\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
-\textit{Ain Shams University}\\
-Cairo, Egypt \\
-hazem.abbas@eng.asu.edu.eg}
-\and
-\IEEEauthorblockN{Ali Elbehery}
-\IEEEauthorblockA{\textit{Institute of Virology} \\
-	\textit{HelmholtzZentrum München}\\
-	München, Germany \\
-	alielbehery@hotmail.com}
+
+	\IEEEauthorblockN{Aly O. Abdelkareem}
+	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
+		\textit{Ain Shams University}\\
+		Cairo, Egypt \\
+		aly.osama@eng.asu.edu.eg}
+	\and
+	\IEEEauthorblockN{Mostafa Elaraby}
+	\IEEEauthorblockA{\textit{Microsoft Research}\\
+		Cairo, Egypt \\
+		a-moelar@microsoft.com}
+	\and
+	\IEEEauthorblockN{Mahmoud I. Khalil}
+	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
+		\textit{Ain Shams University}\\
+		Cairo, Egypt \\
+		mahmoud.khalil@eng.asu.edu.eg}
+	\and
+	\IEEEauthorblockN{Hazem M. Abbas}
+	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
+		\textit{Ain Shams University}\\
+		Cairo, Egypt \\
+		hazem.abbas@eng.asu.edu.eg}
+	\and
+	\IEEEauthorblockN{Ali Elbehery}
+	\IEEEauthorblockA{\textit{Institute of Virology} \\
+		\textit{HelmholtzZentrum München}\\
+		München, Germany \\
+		alielbehery@hotmail.com}
 }
+
+
 
 \maketitle
 
@@ -52,7 +54,7 @@ hazem.abbas@eng.asu.edu.eg}
 \end{abstract}
 
 \begin{IEEEkeywords}
-metagenomics, deep learning, viruses, sequence model, classification 
+metagenomics; deep learning; virus; sequence model; classification 
 \end{IEEEkeywords}
 
 
@@ -62,20 +64,17 @@ Metagenomics is the cultivation-independent analysis of the genetic information 
 % https://www.the-scientist.com/daily-news/most-gut-microbes-can-be-cultured-33581
 Metagenomic analysis process demonstrates a promising understanding of different microorganisms. It answers some questions about microorganisms in the collection such as Who is there?, What can they do? and what can they potentially do?.
 
+Microorganisms are found everywhere on earth and they are very important in our life. They are essential to our life. In this study, our interest is in Prokaryotic Microorganisms (e.g. Bacteria and Archaea) and viruses. Bacteria are unicellular and microscopic organisms that reproduce by binary fission. On the other hand, viruses are typically submicroscopic consists of genetic materials either DNA or RNA surrounded by a protective coat of proteins and can only replicate inside living host cells as they lack metabolic enzymes and equipment for making proteins, such as ribosomes. The bacterial genomes contain about 200 to a few thousand genes, while the tiniest viral genomes have only three genes and the largest have hundred to 2000 genes. 
 
+Viruses have an impact on different microbial communities and virus-host interaction can change many ecosystems such as human health and aquatic life. Viruses that infect bacteria, called bacteriophages or phages. Furthermore, phages are abundant in different microbiome communities. The viral infection starts when virus binds to a host cell and its genome integrated with the host cell genome. The integrated viral DNA, called a provirus. It is reasonable to find that isolated viruses are just package of genes want to transit from one host cell to another. Scientists are using isolation and culture-independent techniques to study viral diversity and viral-host interactions in microbial communities. Those techniques have many limitations because of there is no universal marker gene for viruses. Some reported most of the sequenced viruses in NCBI RefSeq are from 5\% of known phyla of prokaryotic hosts \cite{roux2015viral}.
 
-Microorganisms are found everywhere on earth and they are very important in our life. They are essential to our life. In this study, our interest is in Prokaryotic Microorganisms
-(e.g. Bacteria and Archaea) and viruses. Bacteria are unicellular and microscopic organisms that reproduce by binary fission. On the other hand, viruses are typically submicroscopic consists of genetic materials either(DNA or RNA) surrounded by a protective coat of proteins and can only replicate inside living host cells. 
+High throughput sequencing technology is used for metagenomic studies which can generate massive amounts of short read sequences of microorganisms. We can sequence  prokaryotic and viral cells in microbial communities regardless of cultivability of the cells at the same time in these samples. Sequencing microbial samples found viral sequences along with prokaryotic hosts. A study found 4-17\% virus sequences in human gut prokaryotic metagenomes \cite{minot2011human}. Moreover, Cellular contamination is quite frequent even with a careful purification of viral particles and this is one of the main reasons why we need a tool that can differentiate between bacterial and viral sequences.
 
-Viruses have an impact on different microbial communities and virus-host interaction can change many ecosystems such as human health and aquatic life. Phages are viruses that mainly infect bacteria and archaea. Furthermore, phages are abundant in Microbiome. Scientists are using isolation and culture-independent techniques to study viral diversity and viral-host interactions in microbial communities. Those techniques have many limitations because of there is no universal marker gene for viruses. Some reported most of the sequenced viruses in NCBI RefSeq are from 5\% of known phyla of prokaryotic hosts \cite{roux2015viral}.
+The broadly adopted technique to know who is in metagenomic data is to assemble the high throughput reads to contigs then search against known genomic database using sequence alignment method in order to infer the type of microorganisms and the existence of species in a metagenomic sample. This approach is very limited because it only finds viruses closely related to those we already know about. It is estimated that only about 15\% of viruses in the human gut microbiome and 10\% in the ocean have similarity to the known viruses \cite{ren2017virfinder}. 
 
-High throughput sequencing technology is used for metagenomic studies which can generate massive amounts of short read sequences from prokaryotic cells in microbial communities regardless of cultivability of the cells, and viruses are inevitably captured at the same time in these samples. Sequencing microbial samples found viral sequences along with prokaryotic hosts. A study found 4-17\% virus sequences in human gut prokaryotic metagenomes \cite{minot2011human}. Moreover, Cellular contamination is quite frequent even with a careful purification of viral particles and this is one of the main reasons why we need a tool that can differentiate between bacterial and viral sequences.
+Machine learning approaches have been used to classify and cluster data based on extracted features. The deep neural network is one of machine learning methods that are considered as a state of the art category for general classification problems. Deep learning shows significant improvements in several artificial intelligence tasks for example image classification, speech recognition, and natural language processing. Moreover, It shows promising results with genomic data \cite{angermueller2016deep}. \\
 
-The classical approach to know who is in metagenomic data is to assemble the high throughput reads to contigs then search against know genomic database in order to know these microorganisms. This approach is very limited because it only finds viruses closely related to those we already know about. It is estimated that only about 15\% of viruses in the human gut microbiome and 10\% in the ocean have similarity to the known viruses \cite{ren2017virfinder}. 
-
-Machine learning approaches have been used to classify and cluster data based on hand-made features. The deep neural network is one of machine learning methods that are considered as a state of the art category for general classification problems. Deep learning shows significant improvements in several artificial intelligence tasks for example image classification, speech recognition, and natural language processing. Moreover, It shows promising results with genomic data \cite{angermueller2016deep}. \\
-
-In this paper, we introduce a deep sequence model, VirNet, to identify viral sequences from a mixture of virus and bacterial sequences and purify viral metagenomic data from bacterial contamination as well. This will lead to discover more new viruses and help us to understand their functionality and diversity in the ecosystem.
+In this paper, we introduce a deep sequence model, VirNet, to identify viral sequences from a mixture of viral and bacterial sequences and purify viral metagenomic data from bacterial contamination as well. That will guide us to find new viruses and study their genomes and beside of that, it answers many mysteries related to our understanding of their functionality and diversity in the ecosystem.
 
 \section{Related Work}
 
@@ -100,7 +99,7 @@ In this paper, we are using deep learning techniques which is much more suitable
 
 \section{Materials and Methods}
 
-We downloaded Viruses, Bacteria and Archaea genomes from RefSeq database then we split it into a train, valid and test genomes. Then, We took random non-overlapping fragments of different lengths (n= 100,150,300,500,1000). We divided the data into viral and non-viral with an approximate number to make the data balanced as the DNN models don't learn well from unbalanced data. Figure \ref{fig:data_pipline} shows the data pipeline. Table \ref{table:genome_stats} is the number of genomes we used in training and testing. We downloaded all the viruses genomes until Nov. \nth{1}, 2017 but we sampled bacterial genomes.
+We downloaded Viruses, Bacteria and Archaea genomes from RefSeq database then we split it into a train, valid and test genomes. Then, We took random non-overlapping fragments of different lengths n = \{100, 500, 1000, 3000\}. We divided the data into viral and non-viral with an approximate number to make the data balanced as the DNN models don't learn well from unbalanced data. Figure \ref{fig:data_pipline} shows the data pipeline. Table \ref{table:genome_stats} is the number of genomes we used in training and testing. We downloaded all the viruses genomes until Nov. \nth{1}, 2017 but we sampled bacterial genomes.
 
 \begin{figure}
 	\includegraphics[width=\linewidth]{imgs/data_pipeline.PNG}
