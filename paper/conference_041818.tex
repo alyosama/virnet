@@ -5,6 +5,7 @@
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage[super]{nth}
 \usepackage{algorithmic}
+\usepackage{subcaption}
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
@@ -12,71 +13,76 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{\line(1,0){250}\\VirNet: Sequence model for viral identification\\ \line(1,0){250}}
-
+\title{\LARGE \bf VirNet: Sequence model for viral identification}
 
 \author{
-\IEEEauthorblockN{Aly O. Abdelkareem}
-\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
-\textit{Ain Shams University}\\
-Cairo, Egypt \\
-aly.osama@eng.asu.edu.eg}
-\and
-\IEEEauthorblockN{Mostafa Elaraby}
-\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
-\textit{Alexandria University}\\
-Cairo, Egypt \\
-mostafa.m.elaraby@gmail.com}
-\and
-\IEEEauthorblockN{Mahmoud I. Khalil}
-\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
-\textit{Ain Shams University}\\
-Cairo, Egypt \\
-mahmoud.khalil@eng.asu.edu.eg}
-\and
-\IEEEauthorblockN{Hazem M. Abbas}
-\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
-\textit{Ain Shams University}\\
-Cairo, Egypt \\
-hazem.abbas@eng.asu.edu.eg}
-\and
-\IEEEauthorblockN{Ali Elbehery}
-\IEEEauthorblockA{\textit{Institute of Virology} \\
-	\textit{HelmholtzZentrum München}\\
-	München, Germany \\
-	alielbehery@hotmail.com}
+	\IEEEauthorblockN{Aly O. Abdelkareem}
+	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
+		\textit{Ain Shams University}\\
+		Cairo, Egypt \\
+		aly.osama@eng.asu.edu.eg}
+	\and
+	\IEEEauthorblockN{Mostafa Elaraby}
+	\IEEEauthorblockA{\textit{Microsoft Research}\\
+		Cairo, Egypt \\
+		a-moelar@microsoft.com}
+	\and
+	\IEEEauthorblockN{Mahmoud I. Khalil}
+	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
+		\textit{Ain Shams University}\\
+		Cairo, Egypt \\
+		mahmoud.khalil@eng.asu.edu.eg}
+	\and
+	\IEEEauthorblockN{Hazem M. Abbas}
+	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
+		\textit{Ain Shams University}\\
+		Cairo, Egypt \\
+		hazem.abbas@eng.asu.edu.eg}
+	\and
+	\IEEEauthorblockN{Ali H. A. Elbehery}
+	\IEEEauthorblockA{\textit{Institute of Virology} \\
+		\textit{HelmholtzZentrum München}\\
+		München, Germany \\
+		aelbehery@aucegypt.edu}
 }
 
-\maketitle
+%\author{%
+%	Aly O. Abdelkareem$^{1}$, Mahmoud I. Khalil$^{2}$, Mostafa Elaraby$^{3}$, Hazem M. Abbas$^{4}$ and Ali H. A. Elbehery$^{5}$% <-this % stops a space
+%	\thanks{$^{1}$Aly O. Abdelkareem is with department of computer engineering in Faculty of Engineering, Ain Shams University
+%		{\tt\small aly.osama@eng.asu.edu.eg}}%
+%	\thanks{$^{2}$Mahmoud I. Khalil is with department of computer engineering in Faculty of Engineering, Ain Shams University}%
+%	\thanks{$^{3}$Mostafa Elaraby is a Research Software Development Engineer in Microsoft Advanced Research Lab in Cairo}%
+%	\thanks{$^{4}$Hazem M. Abbas is with department of computer engineering in Faculty of Engineering, Ain Shams University}%
+%	\thanks{$^{5}$Ali H. A. Elbehery is in Institute of Virology, Helmholtz Zentrum München{\tt\small aelbehery@aucegypt.edu} }
+%}
 
-\begin{abstract}\\Metagenomics shows a promising understanding of function and diversity of the microbial communities due to the difficulty of studying microorganism with a pure culture isolation. Moreover, the viral identification is considered one of the most important steps in studying microbial communities. Several studies show different methods to identify viruses in mixed metagenomic data and phages in host genomes, using homology and statistical techniques. These techniques have many limitations due to viral genome diversity. In this work, we propose a sequence deep neural model for viral identification of metagenomic data. For testing purpose, we generated fragments of viruses and bacteria from RefSeq genomes with different lengths to find the best hyperparameters of our model. Then, we simulated both microbiome and virome high throughput data from our test-set genomes in order to validate our method. Finally, we applied our tool on a case study of two types of metagenomic data such as Roche 454 and Illumina. We compared our tool to the state-of-the art statistical tool and found it performed much better in terms of accuracy and speed on the same testing data. This tool will help us in growing our insights in natural viruses of microbial communities.
+\maketitle             
+
+\begin{abstract}\\Metagenomics shows a promising understanding of function and diversity of the microbial communities due to the difficulty of studying microorganism with pure culture isolation. Moreover, the viral identification is considered one of the essential steps in studying microbial communities. Several studies show different methods to identify viruses in mixed metagenomic data and phages in host genomes, using homology and statistical techniques. These techniques have many limitations due to viral genome diversity. In this work, we propose a sequence deep neural model for viral identification of metagenomic data. For testing purpose, we generated fragments of viruses and bacteria from RefSeq genomes with different lengths to find the best hyperparameters of our model. Then, we simulated both microbiome and virome high throughput data from our test-set genomes in order to validate our method. %Finally, we applied our tool to a case study of two types of metagenomic data such as Roche 454 and Illumina.
+We compared our tool to the state-of-the-art statistical tool for viral identification and found it performed much better regarding accuracy and speed on the same testing data. This tool will help us in growing our insights into natural viruses of microbial communities.
 \end{abstract}
-
 \begin{IEEEkeywords}
-metagenomics, deep learning, viruses, sequence model, classification 
+metagenomics; deep learning; virus; sequence model; classification 
 \end{IEEEkeywords}
 
 
 \section{Introduction}
 
-Metagenomics is the cultivation-independent analysis of the genetic information of the collective genomes of the microbes within a given environment based on its sampling \cite{izard2014metagenomics}. There is little portion of microbial organisms identified due to the difficulty in studying them using a pure culture isolation. This methodology has been constrained to less than 1\% of host cells and is biased to certain species \cite{labonte2015single}.
+Metagenomics is the cultivation-independent analysis of the genetic information of the collective genomes of the microbes within a given environment based on its sampling \cite{izard2014metagenomics}. There is a little portion of microbial organisms identified due to the difficulty in studying them using pure culture isolation. This methodology has been constrained to less than 1\% of host cells and is biased to certain species \cite{labonte2015single}.
 % https://www.the-scientist.com/daily-news/most-gut-microbes-can-be-cultured-33581
-Metagenomic analysis process demonstrates a promising understanding of different microorganisms. It answers some questions about microorganisms in the collection such as Who is there?, What can they do? and what can they potentially do?.
+Metagenomic analysis process demonstrates a promising understanding of different microorganisms. It answers some questions about microorganisms in the collection such as Who is there?, What can they do? Besides, what can they potentially do?.
 
+Microorganisms are found everywhere on earth, and they are critical in our life. They are essential to our life. In this study, our interest is in Prokaryotic Microorganisms (e.g. Bacteria and Archaea) and viruses. Bacteria are unicellular and microscopic organisms that reproduce by binary fission. On the other hand, viruses are typically submicroscopic consists of genetic materials either DNA or RNA surrounded by a protective coat of proteins and can only replicate inside living host cells as they lack metabolic enzymes and equipment for making proteins, such as ribosomes. The bacterial genomes contain about 200 to a few thousand genes, while the tiniest viral genomes have only three genes and the largest have hundred to 2000 genes. 
 
+Viruses have an impact on different microbial communities, and virus-host interaction can change many ecosystems such as human health and aquatic life. Viruses that infect bacteria are called bacteriophages or phages. Furthermore, phages are abundant in different microbiome communities. The viral infection starts when virus binds to a host cell and its genome integrated with the host cell genome. The integrated viral DNA called a provirus. It is reasonable to find that isolated viruses are just package of genes want to transit from one host cell to another. Scientists are using isolation and culture-independent techniques to study viral diversity and viral-host interactions in microbial communities. Those techniques have many limitations because there is no universal marker gene for viruses. Some reported most of the sequenced viruses in NCBI RefSeq are from 5\% of known phyla of prokaryotic hosts \cite{roux2015viral}.
 
-Microorganisms are found everywhere on earth and they are very important in our life. They are essential to our life. In this study, our interest is in Prokaryotic Microorganisms
-(e.g. Bacteria and Archaea) and viruses. Bacteria are unicellular and microscopic organisms that reproduce by binary fission. On the other hand, viruses are typically submicroscopic consists of genetic materials either(DNA or RNA) surrounded by a protective coat of proteins and can only replicate inside living host cells. 
+High throughput sequencing technology is used for metagenomic studies which can generate massive amounts of short read sequences of microorganisms. We can sequence prokaryotic and viral cells in microbial communities regardless of cultivability of the cells at the same time in these samples. Sequencing microbial samples found viral sequences along with prokaryotic hosts. A study found 4-17\% virus sequences in human gut prokaryotic metagenomes \cite{minot2011human}. Moreover, Cellular contamination is quite frequent even with a careful purification of viral particles, and this is one of the main reasons why we need a tool that can differentiate between bacterial and viral sequences.
 
-Viruses have an impact on different microbial communities and virus-host interaction can change many ecosystems such as human health and aquatic life. Phages are viruses that mainly infect bacteria and archaea. Furthermore, phages are abundant in Microbiome. Scientists are using isolation and culture-independent techniques to study viral diversity and viral-host interactions in microbial communities. Those techniques have many limitations because of there is no universal marker gene for viruses. Some reported most of the sequenced viruses in NCBI RefSeq are from 5\% of known phyla of prokaryotic hosts \cite{roux2015viral}.
+The broadly adopted technique to know who is in metagenomic data is to assemble the high throughput reads to contigs then search against a known genomic database using sequence alignment method in order to infer the type of microorganisms and the existence of species in a metagenomic sample. This approach is minimal because it only finds viruses closely related to those we already know. It is estimated that only about 15\% of viruses in the human gut microbiome and 10\% in the ocean have similarity to the known viruses \cite{ren2017virfinder}. 
 
-High throughput sequencing technology is used for metagenomic studies which can generate massive amounts of short read sequences from prokaryotic cells in microbial communities regardless of cultivability of the cells, and viruses are inevitably captured at the same time in these samples. Sequencing microbial samples found viral sequences along with prokaryotic hosts. A study found 4-17\% virus sequences in human gut prokaryotic metagenomes \cite{minot2011human}. Moreover, Cellular contamination is quite frequent even with a careful purification of viral particles and this is one of the main reasons why we need a tool that can differentiate between bacterial and viral sequences.
+Machine learning approaches have been used to classify and cluster data based on extracted features. The deep neural network is one of machine learning methods that are considered as a state of the art category for general classification problems. Deep learning shows significant improvements in several artificial intelligence tasks for example image classification, speech recognition, and natural language processing. Moreover, It shows significant results with genomic data \cite{angermueller2016deep}. \\
 
-The classical approach to know who is in metagenomic data is to assemble the high throughput reads to contigs then search against know genomic database in order to know these microorganisms. This approach is very limited because it only finds viruses closely related to those we already know about. It is estimated that only about 15\% of viruses in the human gut microbiome and 10\% in the ocean have similarity to the known viruses \cite{ren2017virfinder}. 
-
-Machine learning approaches have been used to classify and cluster data based on hand-made features. The deep neural network is one of machine learning methods that are considered as a state of the art category for general classification problems. Deep learning shows significant improvements in several artificial intelligence tasks for example image classification, speech recognition, and natural language processing. Moreover, It shows promising results with genomic data \cite{angermueller2016deep}. \\
-
-In this paper, we introduce a deep sequence model, VirNet, to identify viral sequences from a mixture of virus and bacterial sequences and purify viral metagenomic data from bacterial contamination as well. This will lead to discover more new viruses and help us to understand their functionality and diversity in the ecosystem.
+In this paper, we introduce a deep sequence model, VirNet, to identify viral sequences from a mixture of viral and bacterial sequences and purify viral metagenomic data from bacterial contamination as well. That will guide us to find new viruses and study their genomes, and beside of that, it answers many mysteries related to our understanding of their functionality and diversity in the ecosystem.
 
 \section{Related Work}
 
@@ -101,28 +107,45 @@ In this paper, we are using deep learning techniques which is much more suitable
 
 \section{Materials and Methods}
 
-We downloaded Viruses, Bacteria and Archaea genomes from RefSeq database then we split it into a train, valid and test genomes. Then, We took random non-overlapping fragments of different lengths (n= 100,150,300,500,1000). We divided the data into viral and non-viral with an approximate number to make the data balanced as the DNN models don't learn well from unbalanced data. Figure \ref{fig:data_pipline} shows the data pipeline. Table \ref{table:genome_stats} is the number of genomes we used in training and testing. We downloaded all the viruses genomes until Nov. \nth{1}, 2017 but we sampled bacterial genomes.
+\subsection{Building training and testing dataset}
+We downloaded viruses, bacteria and archaea genomes from RefSeq database then we divided them randomly into a train and test genomes with 80\% of total base pairs in training. Table \ref{table:genome_stats} shows the number of genomes we used in training and testing. We used all available viral genomes until Nov. \nth{1}, 2017 and a sample from prokaryotic genomes due to the huge number of available prokaryotic genomes. Then, we converted the viral genomes into non-overlapping fragments of different lengths n = \{100, 500, 1000, 3000\}. Beside that, we generated randomly an approximate number of prokaryotic non-overlapping fragments of the same lengths (Table \ref{table:fragments_stats}). We balanced the data of both classes using random under-sampling technique to avoid the deep neural network bias to the majority class. Figure \ref{fig:data_pipline} shows more details for data pipeline.
 
 \begin{figure}
-	\includegraphics[width=\linewidth]{imgs/data_pipeline.PNG}
+	\centering
+	\includegraphics[width=\columnwidth]{imgs/data_pipeline.PNG}
 	\caption{VirNet Data Pipeline}
 	\label{fig:data_pipline}
 \end{figure}
 
 \begin{table}[h!]
 	\centering
-	\begin{tabular}{||c c c||} 
-		& Viruses & Bacteria \& Archaea \\ [0.5ex] 
+	\begin{tabular}{||c c c c||} 
+		Genome & Train & Test & Total \\ [0.5ex] 
 		\hline\hline
-		Total & 9556  & 178784  \\ 
-		Train & 7686  & 143241  \\
-		Test & 1870  & 35543  \\ [1ex] 
+		Viruses & 7686  & 1870 & 9556 \\ 
+		Prokaryotes & 143241  & 35543 & 178784  \\ [1ex] 
 	\end{tabular}
-	\caption{RefSeq Genomes}
+	\caption{The number of used genomes from RefSeq}
 	\label{table:genome_stats}
 \end{table}
 
-Moreover, We generated two metagenomic data Virome and Microbiome of 1M reads (100bp) using Grinder \cite{angly2012grinder} with our test genomes to simulate shotgun metagenomic sequences. Additionally, We used Illumina error model indicated by mutation\_dist poly4 3e-3 3.3e-8 and mutation ratio 91:9 (9 indels for each 91 substitution mutations) because for Illumina indel errors occur more often than substitution errors \cite{laehnemann2015denoising}. Table \ref{table:simulate_stats} shows simulated data statistics.  \\
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{||c c c||} 
+		Fragment Length (N) & Train & Test \\ [0.5ex] 
+		\hline\hline
+		100 bp & 2088863  & 527020  \\ 
+		500 bp & 420857  & 106168  \\
+		1000 bp & 212253  & 53528  \\
+		3000 bp & 73163  & 18425  \\ [1ex] 
+	\end{tabular}
+	\caption{The number of fragments generated from viruses genomes}
+	\label{table:fragments_stats}
+\end{table}
+
+\subsection{Generating simulated virome and microbiome}
+Grinder \cite{angly2012grinder} is an open-source tool commonly used for generating a simulate amplicon and shotgun metagenomic datasets from reference genomes. 
+We generated two metagenomic data of virome and microbiome of 1M reads and fragment length 100bp using Grinder with our reference test genomes to simulate shotgun metagenomic sequences in order to verify the ability of our tool to work on metagenomic data instead of fragments from the genomes. Moreover, we used Illumina error model indicated by mutation\_dist poly4 3e-3 3.3e-8 and mutation ratio 91:9 (9 indels for each 91 substitution mutations) because for Illumina indel errors occur more often than substitution errors \cite{laehnemann2015denoising}. Table \ref{table:simulate_stats} shows simulated data statistics.  \\
 
 \begin{table}[h!]
 	\centering
@@ -143,148 +166,175 @@ Moreover, We generated two metagenomic data Virome and Microbiome of 1M reads (1
 	\label{table:simulate_stats}
 \end{table}
 
-Then, we applied our tool to two real metagenomes as a case study
-\begin{enumerate}
-	\item \textbf{454}: Subtropical freshwater microbial and viral metagenome (SRR648314).\
-	\item \textbf{Illumina}: Lake Michigan virome (SRX995836).
-\end{enumerate}
 
-Our tool is able to read not only fasta files and fastq files. Furthermore, it is able to deal with paired-end reads i.e. if one of the two pairs is identified as a virus, the other should be the same. If there are conflicts between the classifications of the two pairs; this pair could be denoted as ambiguous.
+%\subsection{Case Study: Real metagenomic data}
+%We applied our tool to two real metagenomes as a case study
+%\begin{enumerate}
+%	\item \textbf{454}: Subtropical freshwater microbial and viral metagenome (SRR648314).\
+%	\item \textbf{Illumina}: Lake Michigan virome (SRX995836).
+%\end{enumerate}
+%Our tool is able to read not only fasta files and fastq files. Furthermore, it is able to deal with paired-end reads i.e. if one of the two pairs is identified as a virus, the other should be the same. If there are conflicts between the classifications of the two pairs; this pair could be denoted as ambiguous.
 
-\section{Deep Learning Model}
-The Deep Learning system is implemented as an attentional encoder network  \ref{fig:encoder}. An input sequence  $\mathbf{x = (x_{1} , \ldots{} , x_{m} )}$  and calculates a forward sequence of hidden states  ($\mathbf{\overrightarrow{h_{1}}}$,\ldots{},$\mathbf{ \overrightarrow{h_{m}}}$). The hidden states $\mathbf{\overrightarrow{h_{j}}}$  are averaged to obtain the attention vector $\mathbf{h_{j}}$ representing the context vector from the input sequence.
+\subsection{Deep Learning Model}
+The deep learning model is implemented as an attentional encoder network (Figure \ref{fig:encoder}). An input sequence  $\mathbf{x = (x_{1} , \ldots{} , x_{m} )}$  and calculates a forward sequence of hidden states  ($\mathbf{\overrightarrow{h_{1}}}$,\ldots{},$\mathbf{ \overrightarrow{h_{m}}}$). The hidden states $\mathbf{\overrightarrow{h_{j}}}$  are averaged to obtain the attention vector $\mathbf{h_{j}}$ representing the context vector from the input sequence.
 
-Embedding Layer maps discrete input words to dense vectors for computational efficiency before feeding this sequence to LSTM/GRU Layers.
+Embedding Layer maps discrete input words to dense vectors for computational efficiency before feeding this sequence to LSTM/GRU Layers. The attentional network could learn how to extract suitable features from the raw data and can attend to previous DNA nucleotide within the same input sequence. 
+
+Recurrent neural networks (RNN), long short-term memory (LSTM) \cite{hochreiter1997long} and gated recurrent neural networks (GRU) \cite{chung2014empirical} can model complex sequences and have been used for sequence modeling problems.
 
 
-The attentional network could learn how to extract suitable features from the raw data, and can attend to previous DNA nucleotide within the same input sequence. 
-
-Recurrent neural networks (RNN), long short-term memory (LSTM) \cite{hochreiter1997long} and gated recurrent neural networks (GRU) \cite{chung2014empirical} can model complex sequences and have been used for sequence modeling problems. All these variations were used during to get the performing model over the input fragments. 
-
-LSTM encoder have 3 gates to protect and control the cell state as in \ref{fig:lstm_gru},the input gate denoted $\mathbf{i}$ which defines how much of the newly computed state you want to let through, forget gate denoted $\mathbf{f}$ that decides what information is to be kept and what is to be thrown away ,  the output of the update gate denoted $\mathbf{U}$ that's used to update the cell state and the output of the LSTM cell $\mathbf{o}$ .$\mathbf{W}$ is the recurrent connection at the previous hidden layer and current hidden layer and $\mathbf{C}$ is the internal memory of the unit  as shown in the following equations \newline
+LSTM encoder have 3 gates to protect and control the cell state, the input gate denoted $\mathbf{i}$ which defines how much of the newly computed state you want to let through, forget gate denoted $\mathbf{f}$ that decides what information is to be kept and what is to be thrown away ,  the output of the update gate denoted $\mathbf{U}$ that's used to update the cell state and the output of the LSTM cell $\mathbf{o}$ .$\mathbf{W}$ is the recurrent connection at the previous hidden layer and current hidden layer and $\mathbf{C}$ is the internal memory of the unit  as shown in the following equations \newline
 $\mathbf{i_{t}=\sigma(x_{t}U^i + h_{t-1}W^i)}$ \newline
 $\mathbf{f_{t}=\sigma(x_{t}U^f + h_{t-1}W^f)}$ \newline
 $\mathbf{o_{t}=\sigma(x_{t}U^o + h_{t-1}W^o)}$. 
 
-GRU encoder \ref{fig:lstm_gru} is same as LSTM except it has only 2 gates, Reset gate denoted $\mathbf{r}$ that determines how to combine the new input with the previously saved input state and the update gate denoted $\mathbf{z}$ that defines the amount of information to keep around, as defined  in the following equations \newline
+GRU encoder is same as LSTM except it has only 2 gates, Reset gate denoted $\mathbf{r}$ that determines how to combine the new input with the previously saved input state and the update gate denoted $\mathbf{z}$ that defines the amount of information to keep around, as defined  in the following equations \newline
 $\mathbf{z_{t}=\sigma(x_{t}U^z + h_{t-1}W^z)}$ \newline
 $\mathbf{r_{t}=\sigma(x_{t}U^r + h_{t-1}W^r)}$ \newline
 $\mathbf{\overline{h_{t}} = tanh(x_{t}U^h + (r_{t} * h_{t-1})W^h )}$ \newline
-$\mathbf{ h_{t} = (1-z_{t})*h_{t-1} +z_{t}*\overline{h_{t}}}$.
+$\mathbf{ h_{t} = (1-z_{t})h_{t-1} +z_{t}\overline{h_{t}}}$.
 
-The few number of gates in GRU makes it faster than the LSTM cell and based on the data might have better performance. In our model after validating various type of models the GRU attentional model performed well on the input DNA nucleotide.
 
- 
- The attentional neural model \ref{fig:model_diagram} was trained with the DNA nucleotide bases with 100bp fragments.The model will then try to predict in a binary format whether this fragment is viral or non-viral.
- 
-The top performing model consists of an input embedding layer of size 128 mapping input DNA nucleotide tokens into an embedding space , that's fed to a GRU layer.The forward sequence $\mathbf{\overrightarrow{h_{j}}}$ is then averaged togethor to create an attentional vector representing token context within the same fragment.A dropout layer was added after the attentional layer to avoid overfitting over the input data.
+The attentional neural model was trained with the DNA nucleotide bases with 100bp fragments. The model will then try to predict in a binary format whether this fragment is viral or non-viral.
 
-The input sequence is divided into 5 grams sized tokens these tokens are then treated as single word .This single token is mapped as a point in the embedding space created during training the neural model.
+The top-performing model (Figure \ref{fig:model_diagram}) consists of an input embedding layer of size 128 mapping input DNA nucleotide tokens into an embedding space, that is fed to an LSTM layer. The forward sequence $\mathbf{\overrightarrow{h_{j}}}$ is then averaged together to create an attentional vector representing token context within the same fragment. A dropout layer was added after the attentional layer to avoid overfitting over the input data.
 
-During training all parameters are optimized jointly using Adam to maximize the conditional probability of tokens found together to predict if an input sequence is viral or not.
+LSTM layer was performing better as in \ref{table:hyper_results} than the GRU cell.GRU encoder having less gates than LSTM model make it faster and easier to converge , but depedending on the size and the format of the input data LSTM with more gates would be slower but will outperform GRU encoder type.
 
- In this model , an early stopping mechanism was used as a form of regularization to avoid overfitting over the data while making more epochs over the data. The early stopping mechanism was used with patience of 3 non  improving consecutive epochs , the neural model will stop training while saving the latest improving checkpoint over the validation set defined. 
+The input sequence is divided into 5 grams sized tokens these tokens are then treated as a single word.This single token is mapped as a point in the embedding space created during training the neural model.
 
+During training, all parameters are optimized jointly using Adam to maximize the conditional probability of tokens found together to predict if an input sequence is viral or not.
+
+In this model, an early stopping mechanism was used as a form of regularization to avoid over-fitting over the data while making more epochs over the data. The early stopping mechanism was used with patience of 3 non -improving consecutive epochs; the neural model will stop training while saving the latest improving checkpoint over the validation set defined.
+
+\subsection{Hyperparameters optimization}
+
+Model parameters affect the performance of the deep learning model, and they control the behavior of the training algorithm as well. We selected the grid search technique in order to find the most suitable parameters. The grid search is considered a traditional technique for hyperparameters optimization and it brute force different combinations. We ran several experiments on 20\% of our training set for 500 bp. Then, we divided it into training, validation, and testing set with the following percentages 70\%, 10\%, and 20\%. These experiments were designed to find the best parameters for the number of recurrent layers, the embedding size for each layer and the input sub-words (ngram). Our reported results (Table \ref{table:hyper_results}) shows that the best parameters setup was for 2 layers, 128 embedding size, and 5 ngram. 
+
+We ran other experiments with the same parameters to check the ability of our model with other configuration, so we changed different parameters separately such as embedding size to 256 neurons, the number of layers to 3 and the recurrent cell type to GRU instead of LSTM. We found a slightly less accuracy and roc-auc scores but the training time was much more than the best parameters configuration as expected due to increasing number of neural network parameters.
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{||c c c c c||} 
+		\#Layers & Embedding (\#Neurons) & Ngram & ROC-AUC & Accuracy \\ [0.5ex] 
+		\hline\hline
+		1      & 32                      & 3     & 0.8     & 73.66    \\
+		1      & 32                      & 5     & 0.83    & 76.42    \\
+		1      & 32                      & 7     & 0.79    & 72.11    \\
+		1      & 64                      & 3     & 0.83    & 76.1     \\
+		1      & 64                      & 5     & 0.83    & 75.98    \\
+		1      & 64                      & 7     & 0.77    & 69.96    \\
+		1      & 128                     & 3     & 0.83    & 75.76    \\
+		1      & 128                     & 5     & 0.85    & 77.41    \\
+		1      & 128                     & 7     & 0.78    & 70.93    \\
+		2      & 32                      & 3     & 0.8     & 73.25    \\
+		2      & 32                      & 5     & 0.83    & 76.49    \\
+		2      & 32                      & 7     & 0.79    & 72.82    \\
+		2      & 64                      & 3     & 0.81    & 73.96    \\
+		2      & 64                      & 5     & 0.84    & 76.46    \\
+		2      & 64                      & 7     & 0.78    & 72.53    \\
+		2      & 128                     & 3     & 0.83    & 76.15    \\
+		\textbf{2} & \textbf{128}            & \textbf{5} & \textbf{0.85} & \textbf{77.9} \\
+		2      & 128                     & 7     & 0.78    & 70.63    \\[1ex]
+	\end{tabular}
+	\caption{Hyperparamters optimization results}
+	\label{table:hyper_results}
+\end{table}
 
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.8\columnwidth]{imgs/encoder.PNG}
-	\caption{Embedding Layer}
-	\label{fig:encoder}
+	\begin{subfigure}{0.4\textwidth}
+		\includegraphics[width=\linewidth]{imgs/encoder.PNG}
+		\caption{Embedding Layer} 
+		\label{fig:encoder}
+	\end{subfigure}
+	\hspace*{\fill} % separation between the subfigures
+	\begin{subfigure}{0.4\textwidth}
+		\includegraphics[width=\linewidth]{imgs/model_diagram.PNG}
+		\caption{Neural network model architecture} 
+		\label{fig:model_diagram}
+	\end{subfigure}
+	\caption{VirNet model} 
+	\label{fig:model_arch}
 \end{figure}
-
-
-\begin{figure}
-	\centering
-	\includegraphics[width=1\columnwidth]{imgs/lstm_and_gru.PNG}
-	\caption{LSTM and GRU encoders}
-	\label{fig:lstm_gru}
-\end{figure}
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.5\columnwidth]{imgs/model_diagram.PNG}
-	\caption{VirNet Model architecture}
-	\label{fig:model_diagram}
-\end{figure}
-
 
 \section{Results}
 
-To test this method, we generate fragments of viruses and bacteria from RefSeq genomes with different lengths to find the best hyperparameters of our model. Then, We simulated both microbiome and virome high throughput data from our test-set genomes in order to validate our method. Finally, we applied our tool on a case study of two types of metagenomic data such as Roche 454 and Illumina. We found our sequence model reached 85.12\% of accuracy whereas VirFinder tool obtained 75.61\% with the same training and testing data. Table \ref{table:model_results} shows experiment results.
+\subsection{Results for generated fragments}
+We tested VirNet on different lengths of fragments n= \{100, 500, 1000, 3000\} from our testing set of viruses and prokaryotes RefSeq genomes. Moreover, we compared the output results to VirFinder results on the same training and testing data. VirNet predictions outperformed VirFinder for fragments with length 500, 1000 and 3000. The model reached to 82.82\% of accuracy whereas VirFinder tool obtained 75.61\%. Moreover, VirFinder can perdict the short fragments with length 100. Figure \ref{fig:roc_auc_virfindera} shows roc-auc curves of both tools on the testing set. Table \ref{table:virfinder_results} shows the comparison between both tools in terms of accuracy, precision, recall and roc-auc scores.
+
+%\begin{table}[h!]
+%	\centering
+%	\begin{tabular}{||c l l l l l l l l||} 
+%		Length(N) &	\multicolumn{2}{l}{Accuracy} & \multicolumn{2}{l}{Avg. Precision} & \multicolumn{2}{l}{Avg. Recall} &	\multicolumn{2}{l}{ROC-AUC} \\ [0.5ex] 
+%		& VirNet & VirFinder & VirNet & VirFinder & VirNet & VirFinder & VirNet & VirFinder \\
+%				\hline\hline
+%		100 & 71.29\% &	63.9\%	& 0.72 & 0.64 & 0.71 & 0.64 & 0.80 & 0.64 \\
+%		500 & 82.82\% &	75.61\% & 0.83 &	0.76 & 0.83 & 0.76 & 0.9 & 0.75 \\
+%		1000 & 86.82\% &	80.28\% &  0.87 & 0.82 & 0.87 & 0.80 & 0.93 & 0.78 \\
+%		3000 & 90.10\% &	87.11\% & 0.91 & 0.88 & 0.90 & 0.87 & 0.94 & 0.83\\[1ex]
+%	\end{tabular}
+%	\caption{VirFinder Results on our test-set}
+%	\label{table:virfinder_results}
+%\end{table}
 
 \begin{table}[h!]
 	\centering
-	\begin{tabular}{||c c c||} 
-		Model &	Accuracy&	ROC-AUC \\ [0.5ex] 
+	\begin{tabular}{||c l l l l l l||} 
+		Length(N) &	\multicolumn{2}{l}{Accuracy} & \multicolumn{2}{l}{Avg. Precision} & \multicolumn{2}{l}{Avg. Recall}\\ [0.5ex] 
+		& VirNet & VirFinder & VirNet & VirFinder & VirNet & VirFinder \\
 		\hline\hline
-		LSTM ( 1L , 128 N ) + DNN ( 64 N ) &	79.80\% &	80\% \\
-		LSTM ( 2L , 128 N ) + DNN ( 64 N ) &	82.88\%	& 83\% \\
-		LSTM ( 3L , 128 N )  &	80.32\%	& 81\% \\ 
-		LSTM ( 2L, 64 N ) &	79.20\%	& 79.50\% \\ 
-		LSTM ( 2L, 256 N ) &	78.70\%	& 79\% \\
-		RNN ( 2L ) &	81.30\%	& 81\% \\
-		GRU ( 2L ) &	82.10\% &	82\% \\
-		LSTM ( 2L, 128 N, 0.2 dropout) &	\textbf{85.12\%} 	& 85\% \\
-		VirFinder ( Benchmark ) &	\textbf{74.40\%} &	74\% \\[1ex]
+		100 & 71.29\% &	63.9\%	& 0.72 & 0.64 & 0.71 & 0.64 \\
+		500 & 82.82\% &	75.61\% & 0.83 &	0.76 & 0.83 & 0.76\\
+		1000 & 86.82\% &	80.28\% &  0.87 & 0.82 & 0.87 & 0.80 \\
+		3000 & 90.10\% &	87.11\% & 0.91 & 0.88 & 0.90 & 0.87 \\[1ex]
 	\end{tabular}
-	\caption{Hyperparamters optimization results}
-	\label{table:model_results}
-\end{table}
-
-We tried different fragment length (n=100,500,1000,3000) with VirFinder and we found that VirFinder cannot identify viruses 100 bp. See figure \ref{fig:roc_auc_virfinder} and table \ref{table:virfinder_results}.
-
-\begin{figure}
-	\centering
-	\includegraphics[width=\columnwidth]{imgs/roc_auc.png}
-	\caption{VirFinder ROC-AUC curves}
-	\label{fig:roc_auc_virfinder}
-\end{figure}
-
-
-\begin{table}[h!]
-	\centering
-	\begin{tabular}{||c c c c c||} 
-		Length(N) &	Accuracy & Avg. Precision & Avg. Recall &	ROC-AUC Score \\ [0.5ex] 
-		\hline\hline
-		100 &	63.9\%	& 0.64 & 0.64 & 0.64 \\
-		500 &	75.61\% &	0.76 & 0.76 & 0.75 \\
-		1000 &	80.28\% & 0.82 & 0.80 & 0.78 \\
-		3000 &	87.11\% & 0.88 & 0.87 & 0.83\\[1ex]
-	\end{tabular}
-	\caption{VirFinder Results on our test-set}
+	\caption{VirFinder results on fragments test-set}
 	\label{table:virfinder_results}
 \end{table}
 
+\subsection{Results for simulated metagenomes}
 
-We tried VirFinder on the simulated metagenomes and we found that VirFinder accuracy is arround 65\%. See figure \ref{fig:roc_auc_virfinder_simulated} and table \ref{table:virfinder_results_simulated}.
+As mentioned before, we tested VirNet on a simulated metagenomes of 100 bp and we found that VirNet performed much better than VirFinder. VirNet shows accuracy is 70\% while VirFinder is 62.77\% on the virome data and 64.49\% on the microbiome data (Figure \ref{fig:roc_auc_virfinderb} and Table \ref{table:virfinder_results_simulated}).
 
 \begin{figure}
 	\centering
-	\includegraphics[width=\columnwidth]{imgs/roc_auc_simulated.png}
-	\caption{VirFinder ROC-AUC curves on Simulated metagenomes}
-	\label{fig:roc_auc_virfinder_simulated}
+\begin{subfigure}{0.5\textwidth}
+	\includegraphics[width=\linewidth]{imgs/roc_auc.png}
+	\caption{Generated fragments} 
+	\label{fig:roc_auc_virfindera}
+\end{subfigure}
+\begin{subfigure}{0.5\textwidth}
+	\includegraphics[width=\linewidth]{imgs/roc_auc_simulated.png}
+	\caption{Simulated metagenomes} 
+	\label{fig:roc_auc_virfinderb}
+\end{subfigure}
+\caption{VirFinder ROC-AUC curves on fragments and simulated metagenomes} 
+\label{fig:roc_auc_virfinder}
 \end{figure}
-
 
 
 \begin{table}[h!]
 	\centering
-	\begin{tabular}{||c c c c c||} 
-		Length(N) &	Accuracy & Avg. Precision & Avg. Recall &	ROC-AUC Score \\ [0.5ex] 
+	\begin{tabular}{||c l l l l l l||} 
+	Metagenome &	\multicolumn{2}{l}{Accuracy} & \multicolumn{2}{l}{Avg. Precision} & \multicolumn{2}{l}{Avg. Recall}\\ [0.5ex] 
+	& VirNet & VirFinder & VirNet & VirFinder & VirNet & VirFinder \\
 		\hline\hline
-		Virome &	62.77\%	& 0.72 & 0.63 & 0.63 \\
-		Microbiome &	64.49\% &	0.72 & 0.64 & 0.64 \\ [1ex]
+		Virome & 125125 &	62.77\%	& 125125 & 0.72 & 0.63 & 0.63 \\
+		Microbiome &	125125 & 64.49\% &	125125 & 0.72 & 0.64 & 0.64 \\ [1ex]
 	\end{tabular}
-	\caption{VirFinder Results on our Simulated Metagenomes}
+	\caption{VirFinder results on our Simulated Metagenomes}
 	\label{table:virfinder_results_simulated}
 \end{table}
+
+\subsection{VirNet processing speed}
+Using GPUs is an advantage for our tool and make it very fast and scalable with a large number of reads and fragments. The training process is around 6 hours with 2 million reads and the prediction is 15 minutes on 100 thousands reads using Nvidia GeForce GTX 1080 Ti. On the other hand, VirFinder processing the reads on a single CPU which takes 16X VirNet. We can avoid that by using parallel threads for VirFinder but in case you want to retrain it with new data, it will take few days. 
 
 \section{Discussion}
 
 In our tool, there are no handmade features as the network will learn how to extract appropriate features for the raw data. It shows better accuracy as it is trained with the updated viral databases with a good statistical model. This helps us to generalize this model with all genomes and to make a generalized model for sequence classification. We also able to identify the short viral sequences as LSTM learns from the dependences between the input sequence. 
-There is no evidence that these training prokaryotic genomes don't have viral infection or not. We need clean the training genomes to get better accuracy. Additionally, Using GPUs in this tool make it very fast and scalable with a large number of sequences. We found VirNet 16X faster than normal methods. 
+There is no evidence that these training prokaryotic genomes don't have viral infection or not. We need clean the training genomes to get better accuracy.
 
 \section{Conclusion}
 
@@ -292,7 +342,13 @@ We developed the first deep sequence network based on viral identification in la
 
 \section*{Acknowledgments}
 
-We would like to thank everyone for their help and supervision.
+We acknowledge Eng. Mayada Elsayed for designing the figures and Dr. Kiran Natra for the support.  
+
+
+\section*{Availability of data}
+
+VirNet is an open-source python package at https://github.com/alyosama/virnet. 
+RefSeq genomes used are publicly available online via NCBI. All other generated data used in this study are available from the corresponding author on a request. 
 
 
 \bibliography{scholar}
