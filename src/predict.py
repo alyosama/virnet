@@ -59,10 +59,10 @@ def load_data(data_path):
         #df=pd.read_csv(data_path)
         data_list=[]
         for record in SeqIO.parse(data_path, "fasta"):
-            data_list.append([record.id,str(record.seq)])
+            data_list.append([record.id,record.description,str(record.seq)])
         print('Loaded {0} fragments from {1}'.format(len(data_list),data_path))
 
-        df=pd.DataFrame(data_list,columns=['ID','SEQ'])
+        df=pd.DataFrame(data_list,columns=['ID','DESC','SEQ'])
 
         df['SEQ']=df['SEQ'].apply(clean_seq)
         return df
@@ -90,8 +90,9 @@ def run_pred(model,input_data):
 def save_pred(input_data,predictions,output_path):
     print('Saving Predictions to {0}'.format(output_path))
     df=pd.DataFrame(input_data['ID'],columns=['ID'])
-    df['PROP']=predictions
-    df['RESULT']=predict_classes(predictions)
+    df['DESC']=input_data['DESC']
+    df['score']=predictions
+    df['result']=predict_classes(predictions)
     df.to_csv(output_path)
 
 def load_vocab():
