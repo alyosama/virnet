@@ -15,36 +15,36 @@
 
 \title{\LARGE \bf VirNet: Sequence model for viral identification}
 
-\author{
-	\IEEEauthorblockN{Aly O. Abdelkareem}
-	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
-		\textit{Ain Shams University}\\
-		Cairo, Egypt \\
-		aly.osama@eng.asu.edu.eg}
-	\and
-	\IEEEauthorblockN{Mostafa Elaraby}
-	\IEEEauthorblockA{\textit{Microsoft Research}\\
-		Cairo, Egypt \\
-		a-moelar@microsoft.com}
-	\and
-	\IEEEauthorblockN{Mahmoud I. Khalil}
-	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
-		\textit{Ain Shams University}\\
-		Cairo, Egypt \\
-		mahmoud.khalil@eng.asu.edu.eg}
-	\and
-	\IEEEauthorblockN{Hazem M. Abbas}
-	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
-		\textit{Ain Shams University}\\
-		Cairo, Egypt \\
-		hazem.abbas@eng.asu.edu.eg}
-	\and
-	\IEEEauthorblockN{Ali H. A. Elbehery}
-	\IEEEauthorblockA{\textit{Institute of Virology} \\
-		\textit{HelmholtzZentrum München}\\
-		München, Germany \\
-		aelbehery@aucegypt.edu}
-}
+%\author{
+%	\IEEEauthorblockN{Aly O. Abdelkareem}
+%	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
+%		\textit{Ain Shams University}\\
+%		Cairo, Egypt \\
+%		aly.osama@eng.asu.edu.eg}
+%	\and
+%	\IEEEauthorblockN{Mostafa Elaraby}
+%	\IEEEauthorblockA{\textit{Microsoft Research}\\
+%		Cairo, Egypt \\
+%		a-moelar@microsoft.com}
+%	\and
+%	\IEEEauthorblockN{Mahmoud I. Khalil}
+%	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
+%		\textit{Ain Shams University}\\
+%		Cairo, Egypt \\
+%		mahmoud.khalil@eng.asu.edu.eg}
+%	\and
+%	\IEEEauthorblockN{Hazem M. Abbas}
+%	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
+%		\textit{Ain Shams University}\\
+%		Cairo, Egypt \\
+%		hazem.abbas@eng.asu.edu.eg}
+%	\and
+%	\IEEEauthorblockN{Ali H. A. Elbehery}
+%	\IEEEauthorblockA{\textit{Institute of Virology} \\
+%		\textit{HelmholtzZentrum München}\\
+%		München, Germany \\
+%		aelbehery@aucegypt.edu}
+%}
 
 %\author{%
 %	Aly O. Abdelkareem$^{1}$, Mahmoud I. Khalil$^{2}$, Mostafa Elaraby$^{3}$, Hazem M. Abbas$^{4}$ and Ali H. A. Elbehery$^{5}$% <-this % stops a space
@@ -262,7 +262,7 @@ We ran other experiments with the same parameters to check the ability of our mo
 \section{Results}
 
 \subsection{Results for generated fragments}
-We tested VirNet on different lengths of fragments n= \{100, 500, 1000, 3000\} from our testing set of viruses and prokaryotes RefSeq genomes. Moreover, we compared the output results to VirFinder results on the same training and testing data. VirNet predictions outperformed VirFinder for fragments with length 500, 1000 and 3000. The model reached to 82.82\% of accuracy whereas VirFinder tool obtained 75.61\%. Moreover, VirFinder can perdict the short fragments with length 100. Figure \ref{fig:roc_auc_virfindera} shows roc-auc curves of both tools on the testing set. Table \ref{table:virfinder_results} shows the comparison between both tools in terms of accuracy, precision, recall and roc-auc scores.
+We tested VirNet on different lengths of fragments n= \{100, 500, 1000, 3000\} from our testing set of viruses and prokaryotes RefSeq genomes. Moreover, we compared the output results to VirFinder results on the same training and testing data. VirNet predictions outperformed VirFinder for fragments with length 500, 1000 and 3000. The model reached to 82.82\% of accuracy whereas VirFinder tool obtained 75.61\%. Moreover, VirFinder can perdict the short fragments with length 100. Figures \ref{fig:roc_auc_virfindera} and \ref{fig:roc_auc_virneta} shows roc-auc curves of both tools on the testing set. Table \ref{table:virfinder_results} shows the comparison between both tools in terms of accuracy, precision, recall and roc-auc scores.
 
 %\begin{table}[h!]
 %	\centering
@@ -300,14 +300,19 @@ As mentioned before, we tested VirNet on a simulated metagenomes of 100 bp and w
 
 \begin{figure}
 	\centering
-\begin{subfigure}{0.5\textwidth}
+\begin{subfigure}{0.4\textwidth}
 	\includegraphics[width=\linewidth]{imgs/roc_auc.png}
-	\caption{Generated fragments} 
+	\caption{VirFinder performance on generated fragments} 
 	\label{fig:roc_auc_virfindera}
 \end{subfigure}
-\begin{subfigure}{0.5\textwidth}
+\begin{subfigure}{0.4\textwidth}
+	\includegraphics[width=\linewidth]{imgs/vir_roc_auc.png}
+	\caption{VirNet performance on generated fragments} 
+	\label{fig:roc_auc_virneta}
+\end{subfigure}
+\begin{subfigure}{0.4\textwidth}
 	\includegraphics[width=\linewidth]{imgs/roc_auc_simulated.png}
-	\caption{Simulated metagenomes} 
+	\caption{VirFinder performance on the simulated genomes} 
 	\label{fig:roc_auc_virfinderb}
 \end{subfigure}
 \caption{VirFinder ROC-AUC curves on fragments and simulated metagenomes} 
@@ -329,26 +334,30 @@ As mentioned before, we tested VirNet on a simulated metagenomes of 100 bp and w
 \end{table}
 
 \subsection{VirNet processing speed}
-Using GPUs is an advantage for our tool and make it very fast and scalable with a large number of reads and fragments. The training process is around 6 hours with 2 million reads and the prediction is 15 minutes on 100 thousands reads using Nvidia GeForce GTX 1080 Ti. On the other hand, VirFinder processing the reads on a single CPU which takes 16X VirNet. We can avoid that by using parallel threads for VirFinder but in case you want to retrain it with new data, it will take few days. 
+Using GPUs is an advantage for our tool and make it very fast and scalable with a large number of reads and fragments. The training process is around 5 hours with 2 million reads and the prediction is 30 seconds on 100 thousand reads using Nvidia GeForce GTX 1080 Ti. On the other hand, VirFinder processing the reads on a single CPU which takes 16X VirNet. We can avoid that by using parallel threads for VirFinder but in case you want to retrain it with new data, it will take a few days.
 
 \section{Discussion}
 
 In our tool, there are no handmade features as the network will learn how to extract appropriate features for the raw data. It shows better accuracy as it is trained with the updated viral databases with a good statistical model. This helps us to generalize this model with all genomes and to make a generalized model for sequence classification. We also able to identify the short viral sequences as LSTM learns from the dependences between the input sequence. 
-There is no evidence that these training prokaryotic genomes don't have viral infection or not. We need clean the training genomes to get better accuracy.
+
+There is no evidence that these training prokaryotic genomes don't have a viral infection or not. Cleaning the training genomes would give us better accuracy but based on sampling and randomizing prokaryotic fragments, our training data might not contain proviruses. 
+
+For the trained deep learning model, using a sliding window over the input DNA sequence might improve our model , the only drawback of this technique is the slow train and inference time of input sequences, Also using an adaptive learning rate decaying over time steps during the training might improve the model performance ,but will need more tuning over the input data.
 
 \section{Conclusion}
 
-We developed the first deep sequence network based on viral identification in large data. This tool will help us in expanding our knowledge in natural viral communities.
+This attentional neural deep learning network was able to achieve state of the art results on viral identification from input sequences in large data.
+VirNet tool can classify preprocessed input genomes into a viral or non-viral sequence with an accuracy of more than 0.83 which would help us in expanding our knowledge in natural viral communities.
 
-\section*{Acknowledgments}
+%\section*{Acknowledgments}
 
-We acknowledge Eng. Mayada Elsayed for designing the figures and Dr. Kiran Natra for the support.  
+%We acknowledge Eng. Mayada Elsayed for designing the figures and Dr. Kiran Natra for the support.  
 
 
-\section*{Availability of data}
+%\section*{Availability of data}
 
-VirNet is an open-source python package at https://github.com/alyosama/virnet. 
-RefSeq genomes used are publicly available online via NCBI. All other generated data used in this study are available from the corresponding author on a request. 
+%VirNet is an open-source python package at https://github.com/alyosama/virnet. 
+%RefSeq genomes used are publicly available online via NCBI. All other generated data used in this study are available from the corresponding author on a request. 
 
 
 \bibliography{scholar}

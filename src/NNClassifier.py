@@ -139,8 +139,3 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
         X_t =self.tokenize(list(train_sentences),ngrams)
         X_te = self.tokenize(list(test_sentences),ngrams)
         return X_t,X_te
-
-    def tokenize_predict(self,train_sentences,ngrams=3): 
-        self.tokenize_train(list(train_sentences),ngrams)
-        X_t =self.tokenize(list(train_sentences),ngrams)
-        return X_t
