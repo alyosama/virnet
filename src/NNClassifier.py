@@ -101,8 +101,11 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
 
 
     def predict(self, X):
-        #self.model.load_weights(self.file_path)
         return self.model.predict([X],batch_size=1024, verbose=1)
+
+    def load_model(self,model_path):
+        self.model = self.lstm_model()
+        self.model.load_weights(model_path)
 
     def predict_proba(self, X):
         return self.predict(X)
@@ -136,3 +139,8 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
         X_t =self.tokenize(list(train_sentences),ngrams)
         X_te = self.tokenize(list(test_sentences),ngrams)
         return X_t,X_te
+
+    def tokenize_predict(self,train_sentences,ngrams=3): 
+        self.tokenize_train(list(train_sentences),ngrams)
+        X_t =self.tokenize(list(train_sentences),ngrams)
+        return X_t
