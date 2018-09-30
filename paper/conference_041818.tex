@@ -58,8 +58,9 @@
 
 \maketitle             
 
-\begin{abstract}\\Metagenomics shows a promising understanding of function and diversity of the microbial communities due to the difficulty of studying microorganism with pure culture isolation. Moreover, the viral identification is considered one of the essential steps in studying microbial communities. Several studies show different methods to identify viruses in mixed metagenomic data and phages in host genomes, using homology and statistical techniques. These techniques have many limitations due to viral genome diversity. In this work, we propose a sequence deep neural model for viral identification of metagenomic data. For testing purpose, we generated fragments of viruses and bacteria from RefSeq genomes with different lengths to find the best hyperparameters of our model. Then, we simulated both microbiome and virome high throughput data from our test-set genomes in order to validate our method. %Finally, we applied our tool to a case study of two types of metagenomic data such as Roche 454 and Illumina.
-We compared our tool to the state-of-the-art statistical tool for viral identification and found it performed much better regarding accuracy and speed on the same testing data. This tool will help us in growing our insights into natural viruses of microbial communities.
+\begin{abstract}Metagenomics shows a promising understanding of function and diversity of the microbial communities due to the difficulty of studying microorganism with pure culture isolation. Moreover, the viral identification is considered one of the essential steps in studying microbial communities. Several studies show different methods to identify viruses in mixed metagenomic data and phages in host genomes, using homology and statistical techniques. These techniques have many limitations due to viral genome diversity. In this work, we propose a sequence deep neural model for viral identification of metagenomic data. For testing purpose, we generated fragments of viruses and bacteria from RefSeq genomes with different lengths to find the best hyperparameters of our model. Then, we simulated both microbiome and virome high throughput data from our test genomes dataset with aim of doing validate our approach. 
+%Finally, we applied our tool to a case study of two types of metagenomic data such as Roche 454 and Illumina.
+We compared our tool to the state-of-the-art statistical and popular tool for viral identification and found the performance of VirNet much better regarding accuracy and speed on the same testing data. This tool will help us in growing our insights into natural viruses of microbial communities.
 \end{abstract}
 \begin{IEEEkeywords}
 metagenomics; deep learning; virus; sequence model; classification 
@@ -68,19 +69,19 @@ metagenomics; deep learning; virus; sequence model; classification
 
 \section{Introduction}
 
-Metagenomics is the cultivation-independent analysis of the genetic information of the collective genomes of the microbes within a given environment based on its sampling \cite{izard2014metagenomics}. There is a little portion of microbial organisms identified due to the difficulty in studying them using pure culture isolation. This methodology has been constrained to less than 1\% of host cells and is biased to certain species \cite{labonte2015single}.
+Metagenomics is an analysis of the genetic information of the collective genomes of the microbes within a given environment based on its sampling regardless of cultivability of the cells. \cite{izard2014metagenomics}. There is a little portion of microbial organisms identified due to the difficulty in studying them using pure culture isolation. This methodology has been constrained to less than 1\% of host cells and is biased to certain species \cite{labonte2015single}.
 % https://www.the-scientist.com/daily-news/most-gut-microbes-can-be-cultured-33581
 Metagenomic analysis process demonstrates a promising understanding of different microorganisms. It answers some questions about microorganisms in the collection such as Who is there?, What can they do? Besides, what can they potentially do?.
 
-Microorganisms are found everywhere on earth, and they are critical in our life. They are essential to our life. In this study, our interest is in Prokaryotic Microorganisms (e.g. Bacteria and Archaea) and viruses. Bacteria are unicellular and microscopic organisms that reproduce by binary fission. On the other hand, viruses are typically submicroscopic consists of genetic materials either DNA or RNA surrounded by a protective coat of proteins and can only replicate inside living host cells as they lack metabolic enzymes and equipment for making proteins, such as ribosomes. The bacterial genomes contain about 200 to a few thousand genes, while the tiniest viral genomes have only three genes and the largest have hundred to 2000 genes. 
+Microorganisms are found everywhere on earth, and they are critical in our life. They are essential to our survival. In this study, our interest is in Prokaryotic Microorganisms (e.g. Bacteria and Archaea) and viruses. Bacteria are unicellular and microscopic organisms that reproduce by binary fission. On the other hand, viruses are typically submicroscopic consists of genetic materials either DNA or RNA surrounded by a protective coat of proteins and can only replicate inside living host cells as they don't have metabolic enzymes and equipment such as ribosomes for making proteins. There are 200 to a few thousand genes in the bacterial genomes, while the tiniest viral genomes have only three genes and the largest have hundred to 2000 genes.
 
-Viruses have an impact on different microbial communities, and virus-host interaction can change many ecosystems such as human health and aquatic life. Viruses that infect bacteria are called bacteriophages or phages. Furthermore, phages are abundant in different microbiome communities. The viral infection starts when virus binds to a host cell and its genome integrated with the host cell genome. The integrated viral DNA called a provirus. It is reasonable to find that isolated viruses are just package of genes want to transit from one host cell to another. Scientists are using isolation and culture-independent techniques to study viral diversity and viral-host interactions in microbial communities. Those techniques have many limitations because there is no universal marker gene for viruses. Some reported most of the sequenced viruses in NCBI RefSeq are from 5\% of known phyla of prokaryotic hosts \cite{roux2015viral}.
+Viruses have an impact on different microbial communities, and virus-host interaction can change many ecosystems such as human health and aquatic life. Phages or bacteriophages are viruses that infect bacteria. Furthermore, phages are abundant in different microbiome communities. The viral infection starts when virus binds to a host cell and its genome integrated with the host cell genome. The integrated viral DNA called a provirus. It is reasonable to find that isolated viruses are just package of genes want to move from one host cell to another. Scientists are using isolation and culture-independent techniques to study viral diversity and viral-host interactions in microbial communities. Those techniques have many limitations because there is no universal marker gene for viruses. Some reported most of the sequenced viruses in NCBI RefSeq are from 5\% of known species of prokaryotic organisms \cite{roux2015viral}.
 
-High throughput sequencing technology is used for metagenomic studies which can generate massive amounts of short read sequences of microorganisms. We can sequence prokaryotic and viral cells in microbial communities regardless of cultivability of the cells at the same time in these samples. Sequencing microbial samples found viral sequences along with prokaryotic hosts. A study found 4-17\% virus sequences in human gut prokaryotic metagenomes \cite{minot2011human}. Moreover, Cellular contamination is quite frequent even with a careful purification of viral particles, and this is one of the main reasons why we need a tool that can differentiate between bacterial and viral sequences.
+High throughput sequencing technology is used for metagenomic studies which can generate large number of read  sequences of microorganisms. The expected read length is up to 600 bp and the number of generated reads per run is up to 15 million approximately based on the sequencer platform and used kit \cite{allali2017comparison}. We can sequence prokaryotic and viral cells in microbial communities in a cultivation-independent process at the same time in these samples. Sequencing microbial samples found viral sequences along with prokaryotic hosts. A study found 4-17\% virus sequences in human gut prokaryotic metagenomes \cite{minot2011human}. Moreover, Cellular contamination is quite frequent even with a careful purification of viral particles, and this is one of the main reasons why we need a tool that can differentiate between bacterial and viral sequences.
 
-The broadly adopted technique to know who is in metagenomic data is to assemble the high throughput reads to contigs then search against a known genomic database using sequence alignment method in order to infer the type of microorganisms and the existence of species in a metagenomic sample. This approach is minimal because it only finds viruses closely related to those we already know. It is estimated that only about 15\% of viruses in the human gut microbiome and 10\% in the ocean have similarity to the known viruses \cite{ren2017virfinder}. 
+The broadly adopted technique to know who is in metagenomic data is to assemble the high throughput reads to contigs then search against a known genomic database using sequence alignment method in order to infer the type of microorganisms and the existence of species in a metagenomic sample. This approach is minimal because it only detects viruses almost related to those we already know. It is reported that about 15\% of viruses in the human gut microbiome and 10\% in the ocean have similarity to the known viruses \cite{ren2017virfinder}. 
 
-Machine learning approaches have been used to classify and cluster data based on extracted features. The deep neural network is one of machine learning methods that are considered as a state of the art category for general classification problems. Deep learning shows significant improvements in several artificial intelligence tasks for example image classification, speech recognition, and natural language processing. Moreover, It shows significant results with genomic data \cite{angermueller2016deep}. \\
+Machine learning approaches have been used to classify and cluster data based on extracted features. The deep neural network is one of machine learning methods that are considered as a state of the art category for general classification problems. Deep learning shows significant improvements in several artificial intelligence tasks for example image classification, speech recognition, and natural language processing. Moreover, It shows significant results with genomic data \cite{angermueller2016deep}. %\\
 
 In this paper, we introduce a deep sequence model, VirNet, to identify viral sequences from a mixture of viral and bacterial sequences and purify viral metagenomic data from bacterial contamination as well. That will guide us to find new viruses and study their genomes, and beside of that, it answers many mysteries related to our understanding of their functionality and diversity in the ecosystem.
 
@@ -93,11 +94,11 @@ There has been extensive prior work on viral identification. Recent work has foc
 	\item Phages and Viral sequences. 
 \end{enumerate} 
 
-There are many methods to find phages from prokaryotic genomes such as Phage\_Finder \cite{fouts2006phage_finder}, Prophinder \cite{lima2008prophinder}, PHAST\cite{zhou2011phast}, and PhiSpy \cite{akhter2012phispy}. These tools are using similarity search to known viruses databases using features such as genes. Some of them such as PhiSpy integrates other features such as protein length, AT and GC skew, transcription strand direction and unique virus k-mers. They have many limitations as they failed to detect viral sequences in metagenomic data as the databases are outdated, limited and don't represent viral diversity in the environment. Moreover, It is not optimized to process a large number of contigs \cite{roux2015virsorter} as they depend on alignment and homology processing limitations. 
+There are many methods to find phages from prokaryotic genomes such as Phage\_Finder \cite{fouts2006phage_finder}, Prophinder \cite{lima2008prophinder}, PHAST\cite{zhou2011phast}, and PhiSpy \cite{akhter2012phispy}. These tools are using similarity search to known viruses databases using features such as genes. Some of them such as PhiSpy integrates other features such as  unique virus k-mers, AT and GC skew, protein length and transcription strand direction. They have many limitations as they failed to detect viral sequences in metagenomic data as the databases are outdated, limited and don't represent viral diversity in the environment. Moreover, It is not optimized to process a large number of contigs \cite{roux2015virsorter} as they depend on alignment and homology processing limitations. 
 
 The second type is able to detect viral sequences in mixed metagenomic datasets such as VIROME \cite{wommack2012virome} and MetaVir\cite{roux2011metavir}. They are using similarity search with the databases as same as the first type and Also, they are searching against proteins. Some people are using DIAMOND \cite{buchfink2014Diamond} or Centrifuge \cite{kim2016centrifuge} as they are fast and efficient for microbial classification. The limitation of this approach is related to limited databases as they only search for known genomes. 
 
-The third type is able to detect phages and viral sequences such as VirSorter \cite{roux2015virsorter}. VirSorter is using similarity search to viral databases and integrates other features such as viral hallmark gene, enrichment of viral-like genes, enrichment of uncharacterized genes which make it more accurate but it has many limitations such as it require at least 3 genes within the contig as the smallest virus genome contains 3 genes so it has the same limitations as previous techniques because of using homology strategy. Moreover, it cannot work with short fragments or contigs and it is very slow in processing metagenomic datasets. 
+The third type is able to detect phages and viral sequences such as VirSorter \cite{roux2015virsorter}. VirSorter is using similarity search to viral databases and integrates other features related to analysis of sequence genes such as enrichment of viral-like genes, enrichment of uncharacterized genes and viral hallmark gene which make it more accurate but it has many limitations such as it require at least 3 genes within the contig as the smallest virus genome contains 3 genes because the smallest virus discovered has 3 genes only so it has the same limitations as previous techniques because of using homology strategy. Moreover, it cannot work with short fragments or contigs and it is very slow in processing metagenomic datasets. 
 
 Recently VirFinder \cite{ren2017virfinder} applied machine learning techniques. VirFinder is a statistical method based on the logistic regression model. It uses the K-mer feature which is considered as a discrimination feature for different sequence problems. It shows a great success with short sequences too and They found a great k-mer similarity score with viruses within other prokaryotic genomes. 
 
@@ -108,7 +109,7 @@ In this paper, we are using deep learning techniques which is much more suitable
 \section{Materials and Methods}
 
 \subsection{Building training and testing dataset}
-We downloaded viruses, bacteria and archaea genomes from RefSeq database then we divided them randomly into a train and test genomes with 80\% of total base pairs in training. Table \ref{table:genome_stats} shows the number of genomes we used in training and testing. We used all available viral genomes until Nov. \nth{1}, 2017 and a sample from prokaryotic genomes due to the huge number of available prokaryotic genomes. Then, we converted the viral genomes into non-overlapping fragments of different lengths n = \{100, 500, 1000, 3000\}. Beside that, we generated randomly an approximate number of prokaryotic non-overlapping fragments of the same lengths (Table \ref{table:fragments_stats}). We balanced the data of both classes using random under-sampling technique to avoid the deep neural network bias to the majority class. Figure \ref{fig:data_pipline} shows more details for data pipeline.
+We downloaded viruses, bacteria and archaea genomes from RefSeq database then we divided them randomly into a train and test genomes with 80\% of total base pairs in training. Table \ref{table:genome_stats} shows the number of genomes we used in training and testing. We used all available viral genomes until Nov. \nth{1}, 2017 and a sample from prokaryotic genomes due to the huge number of available prokaryotic genomes. Then, we converted the viral genomes into non-overlapping fragments of different lengths n = \{100, 500, 1000, 3000\}. We generated an approximate number of non-overlapping fragments of prokaryotic genomes with the same lengths randomly as well. (Table \ref{table:fragments_stats}). We balanced the data of both classes using random under-sampling technique to avoid the deep neural network bias to the majority class. Figure \ref{fig:data_pipline} shows more details for data pipeline.
 
 \begin{figure}
 	\centering
@@ -262,7 +263,7 @@ We ran other experiments with the same parameters to check the ability of our mo
 \section{Results}
 
 \subsection{Results for generated fragments}
-We tested VirNet on different lengths of fragments n= \{100, 500, 1000, 3000\} from our testing set of viruses and prokaryotes RefSeq genomes. Moreover, we compared the output results to VirFinder results on the same training and testing data. VirNet predictions outperformed VirFinder for fragments with length 500, 1000 and 3000. The model reached to 82.82\% of accuracy whereas VirFinder tool obtained 75.61\%. Moreover, VirFinder can perdict the short fragments with length 100. Figures \ref{fig:roc_auc_virfindera} and \ref{fig:roc_auc_virneta} shows roc-auc curves of both tools on the testing set. Table \ref{table:virfinder_results} shows the comparison between both tools in terms of accuracy, precision, recall and roc-auc scores.
+We tested VirNet on different lengths of fragments n= \{100, 500, 1000, 3000\} from our testing set of viruses and prokaryotes RefSeq genomes. Moreover, we compared the output results to VirFinder results on the same training and testing data. VirNet predictions outperformed VirFinder for fragments with length 500, 1000 and 3000 (Figure \ref{fig:accuracy_graph}). The model reached to 82.82\% of accuracy whereas VirFinder tool obtained 75.61\%. Moreover, VirFinder can perdict the short fragments with length 100. Figures \ref{fig:roc_auc_virfindera} and \ref{fig:roc_auc_virneta} shows roc-auc curves of both tools on the testing set. Table \ref{table:virfinder_results} shows the comparison between both tools in terms of accuracy, precision, recall and roc-auc scores.
 
 %\begin{table}[h!]
 %	\centering
@@ -300,24 +301,38 @@ As mentioned before, we tested VirNet on a simulated metagenomes of 100 bp and w
 
 \begin{figure}
 	\centering
-\begin{subfigure}{0.4\textwidth}
+	\includegraphics[width=\columnwidth]{imgs/accuracy_graph.PNG}
+	\caption{VirNet vs VirFinder Accuracy}
+	\label{fig:accuracy_graph}
+\end{figure}
+
+
+\begin{figure}
+	\centering
+\begin{subfigure}{0.3\textwidth}
 	\includegraphics[width=\linewidth]{imgs/roc_auc.png}
 	\caption{VirFinder performance on generated fragments} 
 	\label{fig:roc_auc_virfindera}
 \end{subfigure}
-\begin{subfigure}{0.4\textwidth}
-	\includegraphics[width=\linewidth]{imgs/vir_roc_auc.png}
+\begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\linewidth]{imgs/virnet_roc_auc.png}
 	\caption{VirNet performance on generated fragments} 
 	\label{fig:roc_auc_virneta}
 \end{subfigure}
-\begin{subfigure}{0.4\textwidth}
+\begin{subfigure}{0.3\textwidth}
 	\includegraphics[width=\linewidth]{imgs/roc_auc_simulated.png}
 	\caption{VirFinder performance on the simulated genomes} 
 	\label{fig:roc_auc_virfinderb}
 \end{subfigure}
+\begin{subfigure}{0.3\textwidth}
+	\includegraphics[width=\linewidth]{imgs/virnet_roc_auc_simulated.png}
+	\caption{VirNet performance on the simulated genomes} 
+	\label{fig:roc_auc_virnetb}
+\end{subfigure}
 \caption{VirFinder ROC-AUC curves on fragments and simulated metagenomes} 
 \label{fig:roc_auc_virfinder}
 \end{figure}
+
 
 
 \begin{table}[h!]
@@ -334,7 +349,7 @@ As mentioned before, we tested VirNet on a simulated metagenomes of 100 bp and w
 \end{table}
 
 \subsection{VirNet processing speed}
-Using GPUs is an advantage for our tool and make it very fast and scalable with a large number of reads and fragments. The training process is around 5 hours with 2 million reads and the prediction is 30 seconds on 100 thousand reads using Nvidia GeForce GTX 1080 Ti. On the other hand, VirFinder processing the reads on a single CPU which takes 16X VirNet. We can avoid that by using parallel threads for VirFinder but in case you want to retrain it with new data, it will take a few days.
+Using GPUs is an advantage for our tool and make it very fast and scalable with a large number of reads and fragments. The training process is around 5 hours with 2 million reads and the prediction is 30 seconds on 1 million reads using Nvidia GeForce GTX 1080 Ti. On the other hand, VirFinder processing the reads on a single CPU less than VirNet by around 82 times. We can avoid that by using parallel CPU threads for VirFinder but in case you want to retrain it with new data, it will take a few days.
 
 \section{Discussion}
 
@@ -342,22 +357,20 @@ In our tool, there are no handmade features as the network will learn how to ext
 
 There is no evidence that these training prokaryotic genomes don't have a viral infection or not. Cleaning the training genomes would give us better accuracy but based on sampling and randomizing prokaryotic fragments, our training data might not contain proviruses. 
 
-For the trained deep learning model, using a sliding window over the input DNA sequence might improve our model , the only drawback of this technique is the slow train and inference time of input sequences, Also using an adaptive learning rate decaying over time steps during the training might improve the model performance ,but will need more tuning over the input data.
+For the trained deep learning model, using a sliding window over the input DNA sequence might improve our model , the only drawback of this technique is the slow train and inference time of input sequences, Also using an adaptive learning rate decaying over time steps during the training might improve the model performance, but will need more tuning over the input data.
 
 \section{Conclusion}
 
-This attentional neural deep learning network was able to achieve state of the art results on viral identification from input sequences in large data.
-VirNet tool can classify preprocessed input genomes into a viral or non-viral sequence with an accuracy of more than 0.83 which would help us in expanding our knowledge in natural viral communities.
+This attentional neural deep learning network was able to achieve state of the art results on viral identification from high throughput sequences. Our approach is able to classify short fragments as well. Experimental results validate our approach for identification with an accuracy of more than 83\%. According to these results, Our model would help us in understanding viruses in various microbial communities and discovering new species of viruses.
 
-%\section*{Acknowledgments}
+\section*{Acknowledgments}
 
-%We acknowledge Eng. Mayada Elsayed for designing the figures and Dr. Kiran Natra for the support.  
+We acknowledge Eng. Mayada Elsayed for designing the figures and Dr. Kiran Natra for the support.  
 
 
-%\section*{Availability of data}
+\section*{Availability of data}
 
-%VirNet is an open-source python package at https://github.com/alyosama/virnet. 
-%RefSeq genomes used are publicly available online via NCBI. All other generated data used in this study are available from the corresponding author on a request. 
+VirNet is an open-source python package at https://github.com/alyosama/virnet. RefSeq genomes used are publicly available online via NCBI. All other generated data used in this study are available from the corresponding author on a request. 
 
 
 \bibliography{scholar}
