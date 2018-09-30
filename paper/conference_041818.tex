@@ -262,22 +262,37 @@ We ran other experiments with the same parameters to check the ability of our mo
 \section{Results}
 
 \subsection{Results for generated fragments}
-We tested VirNet on different lengths of fragments n= \{100, 500, 1000, 3000\} from our testing set of viruses and prokaryotes RefSeq genomes. Moreover, we compared the output results to VirFinder results on the same training and testing data. VirNet predictions outperformed VirFinder for fragments with length 500, 1000 and 3000. The model reached to 85.12\% of accuracy whereas VirFinder tool obtained 75.61\%. Moreover, VirFinder can perdict the short fragments with length 100. Figure \ref{fig:roc_auc_virfindera} shows roc-auc curves of both tools on the testing set. Table \ref{table:virfinder_results} shows the comparison between both tools in terms of accuracy, precision, recall and roc-auc scores.
+We tested VirNet on different lengths of fragments n= \{100, 500, 1000, 3000\} from our testing set of viruses and prokaryotes RefSeq genomes. Moreover, we compared the output results to VirFinder results on the same training and testing data. VirNet predictions outperformed VirFinder for fragments with length 500, 1000 and 3000. The model reached to 82.82\% of accuracy whereas VirFinder tool obtained 75.61\%. Moreover, VirFinder can perdict the short fragments with length 100. Figure \ref{fig:roc_auc_virfindera} shows roc-auc curves of both tools on the testing set. Table \ref{table:virfinder_results} shows the comparison between both tools in terms of accuracy, precision, recall and roc-auc scores.
+
+%\begin{table}[h!]
+%	\centering
+%	\begin{tabular}{||c l l l l l l l l||} 
+%		Length(N) &	\multicolumn{2}{l}{Accuracy} & \multicolumn{2}{l}{Avg. Precision} & \multicolumn{2}{l}{Avg. Recall} &	\multicolumn{2}{l}{ROC-AUC} \\ [0.5ex] 
+%		& VirNet & VirFinder & VirNet & VirFinder & VirNet & VirFinder & VirNet & VirFinder \\
+%				\hline\hline
+%		100 & 71.29\% &	63.9\%	& 0.72 & 0.64 & 0.71 & 0.64 & 0.80 & 0.64 \\
+%		500 & 82.82\% &	75.61\% & 0.83 &	0.76 & 0.83 & 0.76 & 0.9 & 0.75 \\
+%		1000 & 86.82\% &	80.28\% &  0.87 & 0.82 & 0.87 & 0.80 & 0.93 & 0.78 \\
+%		3000 & 90.10\% &	87.11\% & 0.91 & 0.88 & 0.90 & 0.87 & 0.94 & 0.83\\[1ex]
+%	\end{tabular}
+%	\caption{VirFinder Results on our test-set}
+%	\label{table:virfinder_results}
+%\end{table}
 
 \begin{table}[h!]
 	\centering
-	\begin{tabular}{||c c c c c||} 
-		Length(N) &	Accuracy & Avg. Precision & Avg. Recall &	ROC-AUC \\ [0.5ex] 
+	\begin{tabular}{||c l l l l l l||} 
+		Length(N) &	\multicolumn{2}{l}{Accuracy} & \multicolumn{2}{l}{Avg. Precision} & \multicolumn{2}{l}{Avg. Recall}\\ [0.5ex] 
+		& VirNet & VirFinder & VirNet & VirFinder & VirNet & VirFinder \\
 		\hline\hline
-		100 &	63.9\%	& 0.64 & 0.64 & 0.64 \\
-		500 &	75.61\% &	0.76 & 0.76 & 0.75 \\
-		1000 &	80.28\% & 0.82 & 0.80 & 0.78 \\
-		3000 &	87.11\% & 0.88 & 0.87 & 0.83\\[1ex]
+		100 & 71.29\% &	63.9\%	& 0.72 & 0.64 & 0.71 & 0.64 \\
+		500 & 82.82\% &	75.61\% & 0.83 &	0.76 & 0.83 & 0.76\\
+		1000 & 86.82\% &	80.28\% &  0.87 & 0.82 & 0.87 & 0.80 \\
+		3000 & 90.10\% &	87.11\% & 0.91 & 0.88 & 0.90 & 0.87 \\[1ex]
 	\end{tabular}
-	\caption{VirFinder Results on our test-set}
+	\caption{VirFinder results on fragments test-set}
 	\label{table:virfinder_results}
 \end{table}
-
 
 \subsection{Results for simulated metagenomes}
 
@@ -302,13 +317,14 @@ As mentioned before, we tested VirNet on a simulated metagenomes of 100 bp and w
 
 \begin{table}[h!]
 	\centering
-	\begin{tabular}{||c c c c c||} 
-		Length(N) &	Accuracy & Avg. Precision & Avg. Recall &	ROC-AUC \\ [0.5ex] 
+	\begin{tabular}{||c l l l l l l||} 
+	Metagenome &	\multicolumn{2}{l}{Accuracy} & \multicolumn{2}{l}{Avg. Precision} & \multicolumn{2}{l}{Avg. Recall}\\ [0.5ex] 
+	& VirNet & VirFinder & VirNet & VirFinder & VirNet & VirFinder \\
 		\hline\hline
-		Virome &	62.77\%	& 0.72 & 0.63 & 0.63 \\
-		Microbiome &	64.49\% &	0.72 & 0.64 & 0.64 \\ [1ex]
+		Virome & 125125 &	62.77\%	& 125125 & 0.72 & 0.63 & 0.63 \\
+		Microbiome &	125125 & 64.49\% &	125125 & 0.72 & 0.64 & 0.64 \\ [1ex]
 	\end{tabular}
-	\caption{VirFinder Results on our Simulated Metagenomes}
+	\caption{VirFinder results on our Simulated Metagenomes}
 	\label{table:virfinder_results_simulated}
 \end{table}
 
@@ -326,7 +342,7 @@ We developed the first deep sequence network based on viral identification in la
 
 \section*{Acknowledgments}
 
-We acknowledge Eng. Mayada Elsayed for designing the figures and Dr. Kiran Natra for her support.  
+We acknowledge Eng. Mayada Elsayed for designing the figures and Dr. Kiran Natra for the support.  
 
 
 \section*{Availability of data}
