@@ -35,13 +35,18 @@ parser.add_argument('--work_dir', dest='work_dir', default='../../work_dir', hel
 parser.add_argument('--input', dest='input_path', help='input file')
 parser.add_argument('--output', dest='output_path', default='output.csv', help='output file csv')
 parser.add_argument('--model_path', dest='model_path', help='the path of the model')
+parser.add_argument('--data', dest='data', default='../../data/3-fragments/fna', help='train mode  Training and Testing data dir')
 
 
 ######### PARAMS #############
 args = parser.parse_args()
+genomes=['non_viral','viral']
 model_name=args.model_name
 input_dim=args.input_dim
 output_dim=1
+data_dir=args.data
+data_file='{0}_{1}.fna_{2}.fna'
+
 
 ######## FILE PATHS ##########
 experiment_name='{0}_I{1}_L{2}'.format(model_name,input_dim,args.n_layers)
@@ -89,6 +94,48 @@ def save_pred(input_data,predictions,output_path):
     df['RESULT']=predict_classes(predictions)
     df.to_csv(output_path)
 
+def load_vocab():
+    def load_fasta(file_path):
+        data_list=[]
+        for record in SeqIO.parse(file_path, "fasta"):
+            data_list.append([record.id,str(record.seq)])
+        print('Loaded {0} fragments from {1}'.format(len(data_list),file_path))
+
+        df=pd.DataFrame(data_list,columns=['ID','SEQ'])
+        return df
+    
+    def clean_seq(seq):
+        return re.sub(r'[^ATGCN]','N',seq.upper())
+
+    def load_csv_fragments(genome,ty,input_dim):
+        data_path=os.path.join(data_dir,data_file.format(genome,ty,input_dim))
+        #df=pd.read_csv(data_path)
+        df=load_fasta(data_path)
+        df['SEQ']=df['SEQ'].apply(clean_seq)
+        if genome == 'viral':
+            df['LABEL']=1
+        else:
+            df['LABEL']=0
+        return df
+        
+    print('Loading training and testing data')
+    train_list=[]
+    test_list=[]
+    for genome in genomes:
+        train_list.append(load_csv_fragments(genome,'train',input_dim))
+        test_list.append(load_csv_fragments(genome,'test',input_dim))
+
+    df_train=pd.concat(train_list)
+    df_test=pd.concat(test_list)
+
+    ## SHUFFLE TRAINING DATA
+    df_train=df_train.sample(frac=1).reset_index(drop=True)  
+    print('Training len {0}'.format(len(df_train)))
+    print('Testing len {0}'.format(len(df_test)))
+    
+    return df_train,df_test
+
+
 def main():
     print('Starting Experiment {0}'.format(experiment_name))
 
@@ -101,13 +148,17 @@ def main():
     batch_size=args.batch_size, embed_size=args.embs,\
     nlayers=args.n_layers, maxlen = int(math.ceil(args.input_dim * 1.0 / args.ngrams)))
 
+    # Prepare Vocab
+    df_train,df_test=load_vocab()
+    X_train,X_test = model.tokenize_set(df_train['SEQ'].values,df_test['SEQ'].values,ngrams=args.ngrams)
+
+    ## Load Testing Data
+    x_data = model.tokenize(df_data['SEQ'].values,ngrams=args.ngrams)
+
     model.load_model(args.model_path)
 
-    # Prepare data
-    x_data = model.tokenize_predict(df_data['SEQ'].values,ngrams=args.ngrams)
-
     predictions=run_pred(model,x_data)
-    save_pred(x_data,predictions,args.output_path)
+    save_pred(df_data,predictions,args.output_path)
 
 
 if __name__ == "__main__":
