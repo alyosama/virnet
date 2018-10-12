@@ -22,9 +22,10 @@ from keras import backend as K
 from keras.layers.core import *
 import numpy as np
 from AttentionLayer import AttentionWeightedAverage
+import sentencepiece as spm 
 
 class NeuralClassifier(BaseEstimator, ClassifierMixin):
-    def __init__(self,exp_name='experiment',attention=True,nclasses=1,nepochs = 20,type='lstm',patience = 5,batch_size = 256 ,embeddings = None, embed_size = 32,vocab_size = None,maxlen = 167,nlayers = 1,ngpus = 1,val_set = 0.1, l_rate=0.001):
+    def __init__(self,exp_name='experiment',attention=True,nclasses=1,nepochs = 20,type='lstm',patience = 5,batch_size = 256 ,embeddings = None, embed_size = 32,vocab_size = None,maxlen = 167,nlayers = 1,ngpus = 1,val_set = 0.1, l_rate=0.001,with_bpe=True):
         """
         Called when initializing the classifier
         """
@@ -49,6 +50,8 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
         self.nlayers = nlayers
         self.callbacks_list = []
         self.tokenizer = None
+        self.with_bpe = with_bpe
+        self.sentence_piece_model = None
 
     def lstm_model(self):
 
@@ -114,28 +117,42 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
         # counts number of values bigger than mean
         return roc_auc_score(y,self.model.predict(X))
     
-    def word_break(self,sentences,ngrams):
-        if ngrams==0:
+    def word_break(self,sentences,noperations):
+        if noperations==0:
             return sentences
-        result = [ re.sub(r'(.{'+str(ngrams)+'})',r'\1 ',sent).strip() for sent in sentences]
+        if self.with_bpe:
+            result = self.sentence_piece_model.EncodeAsPieces(sentences)
+        else:
+            result = [ re.sub(r'(.{'+str(noperations)+'})',r'\1 ',sent).strip() for sent in sentences]
         return result
       
-    def tokenize_train(self,train_sentences,ngrams):
+    def tokenize_train(self,train_sentences,noperations):
         if self.vocab_size is not None:
             self.tokenizer = Tokenizer(num_words=self.vocab_size,char_level=False)
         else:
             self.tokenizer = Tokenizer(char_level=False)
-        self.tokenizer.fit_on_texts(self.word_break(train_sentences,ngrams))
+        self.tokenizer.fit_on_texts(self.word_break(train_sentences,noperations))
         self.vocab_size = len(self.tokenizer.word_index)
         if self.embeddings is not None:
             self.embeddings.set_embeddings_matrix(self.tokenizer.word_index,self.vocab_size)
 
-    def tokenize(self,sentences,ngrams):
-        list_tokenized = self.tokenizer.texts_to_sequences(self.word_break(sentences,ngrams))
+    def tokenize(self,sentences,noperations):
+        list_tokenized = self.tokenizer.texts_to_sequences(self.word_break(sentences,noperations))
         return pad_sequences(list_tokenized , maxlen=self.maxlen)
 
-    def tokenize_set(self,train_sentences,test_sentences,ngrams=3): 
-        self.tokenize_train(list(train_sentences)+list(test_sentences),ngrams)
-        X_t =self.tokenize(list(train_sentences),ngrams)
-        X_te = self.tokenize(list(test_sentences),ngrams)
+    def tokenize_set(self,train_sentences,test_sentences,noperations=3): 
+        if self.with_bpe():
+            #train bpe model with input noperations which should be around 32k
+            #dump all input sentences 
+            sentences = open('sentences.tmp.txt','w',encoding='utf8')
+            sentences.write('\n'.join(list(train_sentences)+list(test_sentences)))
+            sentences.close()
+            spm.SentencePieceTrainer.Train('--input=sentences.tmp.txt --model_prefix=model_'+str(noperations)+' --vocab_size='+str(noperations) +' --model_type=bpe')
+            self.sentence_piece_model =  spm.SentencePieceProcessor()
+            loaded = self.sentence_piece_model.Load('model_'+str(noperations)+'.model')
+            if not(loaded):
+                raise Exception('Failed to load BPE trained model '+'model_'+str(noperations)+'.model') 
+        self.tokenize_train(list(train_sentences)+list(test_sentences),noperations)
+        X_t =self.tokenize(list(train_sentences),noperations)
+        X_te = self.tokenize(list(test_sentences),noperations)
         return X_t,X_te

@@ -16,6 +16,7 @@ from imblearn.under_sampling import RandomUnderSampler
 from NNClassifier import NeuralClassifier
 
 parser = argparse.ArgumentParser(description='VirNet a deep neural network model for virus identification')
+parser.add_argument('--bpe', dest='bpe', type=int, default=-1, help='bpe n operations (default: -1 for no bpe)')
 parser.add_argument('--input_dim', dest='input_dim', type=int, default=500, help='input dim (default: 500)')
 parser.add_argument('--cell_type', dest='model_name', default='lstm', help='model type which is lstm,gru,rnn (default: lstm)')
 parser.add_argument('--batch_size', dest='batch_size', type=int, default=256, help='Batch size (default: 256)')
@@ -24,7 +25,7 @@ parser.add_argument('--lr', dest='lr', type=float, default=0.001, help='learning
 parser.add_argument('--epoch', dest='ep', type=int, default=30, help='number of epochs(default: 30)')
 parser.add_argument('--patience',dest='pt',type=int, default=5, help='number of declining epochs before choosing the best epoch for saving')
 parser.add_argument('--embed_size',dest='embs',type=int, default=128,help='Size of Embedding layer of input tokens (128)')
-parser.add_argument('--ngrams', dest='ngrams', type=int, default=5, help='number of substring used in each sequence (3) ')
+parser.add_argument('--noperations', dest='noperations', type=int, default=5, help='number of substring used in each sequence (3) or number of operations used for bpe ')
 parser.add_argument('--balance_data', dest='balance_data', type=bool, default=True, help='Balance data for two classes using undersampler (True) ')
 parser.add_argument('--sample', dest='sample', type=int, default=-1, help='sample data (n=500 points) to test script (-1) ')
 parser.add_argument('--data', dest='data', default='../../data/3-fragments/fna', help='train mode  Training and Testing data dir')
@@ -195,10 +196,10 @@ def main():
     print('Loading Model')
     model = NeuralClassifier(exp_name=experiment_name, type=args.model_name, nepochs=args.ep, patience=args.pt, l_rate=args.lr,\
     batch_size=args.batch_size, embed_size=args.embs,\
-    nlayers=args.n_layers, maxlen = int(math.ceil(args.input_dim * 1.0 / args.ngrams)))
+    nlayers=args.n_layers, maxlen = int(math.ceil(args.input_dim * 1.0 / args.noperations)), with_bpe=args.bpe>-1)
 
     # Prepare data
-    X_train,X_test = model.tokenize_set(df_train['SEQ'].values,df_test['SEQ'].values,ngrams=args.ngrams)
+    X_train,X_test = model.tokenize_set(df_train['SEQ'].values,df_test['SEQ'].values,noperations=args.noperations)
     y_train=df_train['LABEL'].values
     y_test=df_test['LABEL'].values
 
