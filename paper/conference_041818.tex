@@ -13,40 +13,39 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{\LARGE \bf VirNet: Sequence model for viral identification}
+\title{\LARGE \bf VirNet: Deep Attention Model for Viral Reads Identification}
+
 
 %\author{
 %	\IEEEauthorblockN{Aly O. Abdelkareem}
 %	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
 %		\textit{Ain Shams University}\\
 %		Cairo, Egypt \\
-%		aly.osama@eng.asu.edu.eg}
-%	\and
-%	\IEEEauthorblockN{Mostafa Elaraby}
-%	\IEEEauthorblockA{\textit{Microsoft Research}\\
-%		Cairo, Egypt \\
-%		a-moelar@microsoft.com}
-%	\and
-%	\IEEEauthorblockN{Mahmoud I. Khalil}
-%	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
-%		\textit{Ain Shams University}\\
-%		Cairo, Egypt \\
-%		mahmoud.khalil@eng.asu.edu.eg}
-%	\and
+%		aly.osama@eng.asu.edu.eg}\\
 %	\IEEEauthorblockN{Hazem M. Abbas}
 %	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
 %		\textit{Ain Shams University}\\
 %		Cairo, Egypt \\
 %		hazem.abbas@eng.asu.edu.eg}
 %	\and
+%	\IEEEauthorblockN{Mahmoud I. Khalil}
+%	\IEEEauthorblockA{\textit{Department of Computer Engineering} \\
+%		\textit{Ain Shams University}\\
+%		Cairo, Egypt \\
+%		mahmoud.khalil@eng.asu.edu.eg} \\
 %	\IEEEauthorblockN{Ali H. A. Elbehery}
 %	\IEEEauthorblockA{\textit{Institute of Virology} \\
 %		\textit{HelmholtzZentrum München}\\
 %		München, Germany \\
-%		aelbehery@aucegypt.edu}
+%		ali.elbehery@helmholtz-muenchen.de} 
+%	\and
+%	\IEEEauthorblockN{Mostafa Elaraby}
+%	\IEEEauthorblockA{\textit{Microsoft Research}\\
+%		Cairo, Egypt \\
+%		a-moelar@microsoft.com}
 %}
 
-%\author{%
+%\author{
 %	Aly O. Abdelkareem$^{1}$, Mahmoud I. Khalil$^{2}$, Mostafa Elaraby$^{3}$, Hazem M. Abbas$^{4}$ and Ali H. A. Elbehery$^{5}$% <-this % stops a space
 %	\thanks{$^{1}$Aly O. Abdelkareem is with department of computer engineering in Faculty of Engineering, Ain Shams University
 %		{\tt\small aly.osama@eng.asu.edu.eg}}%
@@ -56,69 +55,72 @@
 %	\thanks{$^{5}$Ali H. A. Elbehery is in Institute of Virology, Helmholtz Zentrum München{\tt\small aelbehery@aucegypt.edu} }
 %}
 
-\maketitle             
+\maketitle  
 
-\begin{abstract}Metagenomics shows a promising understanding of function and diversity of the microbial communities due to the difficulty of studying microorganism with pure culture isolation. Moreover, the viral identification is considered one of the essential steps in studying microbial communities. Several studies show different methods to identify viruses in mixed metagenomic data and phages in host genomes, using homology and statistical techniques. These techniques have many limitations due to viral genome diversity. In this work, we propose a sequence deep neural model for viral identification of metagenomic data. For testing purpose, we generated fragments of viruses and bacteria from RefSeq genomes with different lengths to find the best hyperparameters of our model. Then, we simulated both microbiome and virome high throughput data from our test genomes dataset with aim of doing validate our approach. 
+\begin{abstract}Metagenomics shows a promising understanding of function and diversity of the microbial communities due to the difficulty of studying microorganism with pure culture isolation. Moreover, the viral identification is considered one of the essential steps in studying microbial communities. Several studies show different methods to identify viruses in mixed metagenomic data and phages in host genomes, using homology and statistical techniques. These techniques have many limitations due to viral genome diversity. In this work, we propose a sequence deep neural model for viral identification of metagenomic data. For testing purpose, we generated fragments of viruses and bacteria from RefSeq genomes with different lengths to find the best hyperparameters of our model. Then, we simulated both microbiome and virome high throughput data from our test genomes dataset with aim of validating our approach. 
 %Finally, we applied our tool to a case study of two types of metagenomic data such as Roche 454 and Illumina.
-We compared our tool to the state-of-the-art statistical and popular tool for viral identification and found the performance of VirNet much better regarding accuracy and speed on the same testing data. This tool will help us in growing our insights into natural viruses of microbial communities.
+We compared our tool to the state-of-the-art statistical and popular tool for viral identification and found the performance of VirNet much better regarding accuracy 
+%and speed 
+on the same testing data. This tool will help us in growing our insights to natural viruses of microbial communities.
+
 \end{abstract}
 \begin{IEEEkeywords}
-metagenomics; deep learning; virus; sequence model; classification 
+	classification, deep learning, metagenomics, sequence model, virus
 \end{IEEEkeywords}
 
 
 \section{Introduction}
 
-Metagenomics is an analysis of the genetic information of the collective genomes of the microbes within a given environment based on its sampling regardless of cultivability of the cells. \cite{izard2014metagenomics}. There is a little portion of microbial organisms identified due to the difficulty in studying them using pure culture isolation. This methodology has been constrained to less than 1\% of host cells and is biased to certain species \cite{labonte2015single}.
+Metagenomics is an analysis of the genetic information of the collective genomes of the microbes within a given environment based on its sampling regardless of cultivability of the cells. \cite{izard2014metagenomics}. There is a minor population of microbial organisms identified due to the difficulty in studying them using pure culture isolation. This methodology has been constrained to less than 1\% of host cells and is biased to certain species \cite{labonte2015single}.
 % https://www.the-scientist.com/daily-news/most-gut-microbes-can-be-cultured-33581
-Metagenomic analysis process demonstrates a promising understanding of different microorganisms. It answers some questions about microorganisms in the collection such as Who is there?, What can they do? Besides, what can they potentially do?.
+Metagenomic analysis process demonstrates a promising understanding of different microorganisms. It answers some questions about the identity of microorganisms in the collection and their potential functional characterization.
 
-Microorganisms are found everywhere on earth, and they are critical in our life. They are essential to our survival. In this study, our interest is in Prokaryotic Microorganisms (e.g. Bacteria and Archaea) and viruses. Bacteria are unicellular and microscopic organisms that reproduce by binary fission. On the other hand, viruses are typically submicroscopic consists of genetic materials either DNA or RNA surrounded by a protective coat of proteins and can only replicate inside living host cells as they don't have metabolic enzymes and equipment such as ribosomes for making proteins. There are 200 to a few thousand genes in the bacterial genomes, while the tiniest viral genomes have only three genes and the largest have hundred to 2000 genes.
+Microorganisms are found everywhere on earth, and they are critical in our survival. This study, our interest is in prokaryotic microorganisms (e.g. bacteria and archaea) and viruses. Bacteria are unicellular and microscopic organisms that reproduce by binary fission. On the other hand, viruses are typically submicroscopic consists of genetic materials either DNA or RNA surrounded by a protective coat of proteins and can only replicate inside living host cells. They lack metabolic enzymes and translational machinery such as ribosomes for making proteins. There are 200 to a few thousand genes in the bacterial genomes, while the tiniest viral genomes have only three genes and the largest have up to 2000 genes.
 
-Viruses have an impact on different microbial communities, and virus-host interaction can change many ecosystems such as human health and aquatic life. Phages or bacteriophages are viruses that infect bacteria. Furthermore, phages are abundant in different microbiome communities. The viral infection starts when virus binds to a host cell and its genome integrated with the host cell genome. The integrated viral DNA called a provirus. It is reasonable to find that isolated viruses are just package of genes want to move from one host cell to another. Scientists are using isolation and culture-independent techniques to study viral diversity and viral-host interactions in microbial communities. Those techniques have many limitations because there is no universal marker gene for viruses. Some reported most of the sequenced viruses in NCBI RefSeq are from 5\% of known species of prokaryotic organisms \cite{roux2015viral}.
+Viruses have an impact on different microbial communities, and virus-host interaction can change many ecosystems such as human health and aquatic life. Phages or bacteriophages are viruses that infect bacteria. Furthermore, phages are abundant in different microbiome communities. The viral infection starts when virus binds to a host cell and its genome integrates with the host cell genome. The integrated viral DNA is called a provirus. It is reasonable to think that isolated viruses are just package of genes moving from one host cell to another. Scientists are using isolation and culturing techniques to study viral diversity and viral-host interactions in microbial communities. Those techniques have many limitations because there is no universal marker gene for viruses. The sequenced viruses in NCBI RefSeq database constitute approximately 5\% of known species of prokaryotic organisms \cite{roux2015viral}.
 
-High throughput sequencing technology is used for metagenomic studies which can generate large number of read  sequences of microorganisms. The expected read length is up to 600 bp and the number of generated reads per run is up to 15 million approximately based on the sequencer platform and used kit \cite{allali2017comparison}. We can sequence prokaryotic and viral cells in microbial communities in a cultivation-independent process at the same time in these samples. Sequencing microbial samples found viral sequences along with prokaryotic hosts. A study found 4-17\% virus sequences in human gut prokaryotic metagenomes \cite{minot2011human}. Moreover, Cellular contamination is quite frequent even with a careful purification of viral particles, and this is one of the main reasons why we need a tool that can differentiate between bacterial and viral sequences.
+High throughput sequencing technology is used for metagenomic studies which can generate large number of read  sequences of microorganisms. The expected read length is up to 600 bp and the number of generated reads per run is up to 15 million approximately based on the sequencing platform and the library preparation methods \cite{allali2017comparison}. We can sequence mixture of prokaryotic cells and viruses in complex microbial communities in a cultivation-independent process. Sequencing of microbial samples shows contamination of viral sequences within prokaryotic population. A study found 4-17\% virus sequences in human gut prokaryotic metagenomes \cite{minot2011human}. Moreover, cellular contamination is quite frequent even with a careful purification of viral particles, and this is one of the main reasons why we need a tool that can differentiate between bacterial and viral sequences.
 
 The broadly adopted technique to know who is in metagenomic data is to assemble the high throughput reads to contigs then search against a known genomic database using sequence alignment method in order to infer the type of microorganisms and the existence of species in a metagenomic sample. This approach is minimal because it only detects viruses almost related to those we already know. It is reported that about 15\% of viruses in the human gut microbiome and 10\% in the ocean have similarity to the known viruses \cite{ren2017virfinder}. 
 
 Machine learning approaches have been used to classify and cluster data based on extracted features. The deep neural network is one of machine learning methods that are considered as a state of the art category for general classification problems. Deep learning shows significant improvements in several artificial intelligence tasks for example image classification, speech recognition, and natural language processing. Moreover, It shows significant results with genomic data \cite{angermueller2016deep}. %\\
 
-In this paper, we introduce a deep sequence model, VirNet, to identify viral sequences from a mixture of viral and bacterial sequences and purify viral metagenomic data from bacterial contamination as well. That will guide us to find new viruses and study their genomes, and beside of that, it answers many mysteries related to our understanding of their functionality and diversity in the ecosystem.
+In this paper, we introduce a deep sequence model, VirNet, to identify viral reads from a mixture of viral and bacterial sequences and purify viral metagenomic data from bacterial contamination as well. That will guide us to identify new viruses and potentially perform functional characterization. Additionally, it will answer many mysteries related to our understanding of their functionality and diversity in the ecosystem.
 
 \section{Related Work}
 
-There has been extensive prior work on viral identification. Recent work has focused on identifying phages in bacterial genomes. Several methods have used similarity search with the known genomes in order to find viral contigs. There are three types of recent tools:
+There has been extensive prior work on viral identification. Recent work has focused on identifying phages in bacterial genomes. Several methods have used similarity search by sequence alignment with the reference genomes in order to find viral contigs. Most of the recent tools fall under three categories based on the sample structure such as:
 \begin{enumerate}
-	\item Phages from prokaryotic genomes
-	\item Viral sequences in mixed metagenomic datasets
-	\item Phages and Viral sequences. 
+	\item phages from prokaryotic genomes
+	\item viral sequences in mixed metagenomic datasets
+	\item phages and viral sequences. 
 \end{enumerate} 
 
-There are many methods to find phages from prokaryotic genomes such as Phage\_Finder \cite{fouts2006phage_finder}, Prophinder \cite{lima2008prophinder}, PHAST\cite{zhou2011phast}, and PhiSpy \cite{akhter2012phispy}. These tools are using similarity search to known viruses databases using features such as genes. Some of them such as PhiSpy integrates other features such as  unique virus k-mers, AT and GC skew, protein length and transcription strand direction. They have many limitations as they failed to detect viral sequences in metagenomic data as the databases are outdated, limited and don't represent viral diversity in the environment. Moreover, It is not optimized to process a large number of contigs \cite{roux2015virsorter} as they depend on alignment and homology processing limitations. 
+There are many software packages to find phages from prokaryotic genomes such as Phage\_Finder \cite{fouts2006phage_finder}, Prophinder \cite{lima2008prophinder}, PHAST\cite{zhou2011phast}, and PhiSpy \cite{akhter2012phispy}. These tools are using similarity search to known virus databases using features such as genes. Some of them such as PhiSpy integrates other features such as  unique virus k-mers, AT and GC skew, protein length and transcription strand direction. They have many limitations as they failed to detect viral sequences in metagenomic data as the databases are outdated, limited and don't represent viral diversity in the environment. Moreover, It is not optimized to process a large number of contigs \cite{roux2015virsorter} as they depend on alignment and homology processing limitations. 
 
-The second type is able to detect viral sequences in mixed metagenomic datasets such as VIROME \cite{wommack2012virome} and MetaVir\cite{roux2011metavir}. They are using similarity search with the databases as same as the first type and Also, they are searching against proteins. Some people are using DIAMOND \cite{buchfink2014Diamond} or Centrifuge \cite{kim2016centrifuge} as they are fast and efficient for microbial classification. The limitation of this approach is related to limited databases as they only search for known genomes. 
+The second category is able to detect viral sequences in mixed metagenomic datasets such as VIROME \cite{wommack2012virome} and MetaVir\cite{roux2011metavir}. They are using similarity search with the databases same as the first category. Additionally, they are searching against proteins. There are more packages such as DIAMOND \cite{buchfink2014Diamond} or Centrifuge \cite{kim2016centrifuge} which are much faster and efficient than the former tools for microbial classification. Again, The limitation of this approach is using limited known reference databases. 
 
-The third type is able to detect phages and viral sequences such as VirSorter \cite{roux2015virsorter}. VirSorter is using similarity search to viral databases and integrates other features related to analysis of sequence genes such as enrichment of viral-like genes, enrichment of uncharacterized genes and viral hallmark gene which make it more accurate but it has many limitations such as it require at least 3 genes within the contig as the smallest virus genome contains 3 genes because the smallest virus discovered has 3 genes only so it has the same limitations as previous techniques because of using homology strategy. Moreover, it cannot work with short fragments or contigs and it is very slow in processing metagenomic datasets. 
+The third category of software packages such as VirSorter \cite{} \cite{roux2015virsorter} is able to detect phages and viral sequences. VirSorter is using similarity search to viral databases and integrates other features related to analysis of sequence genes such as enrichment of viral-like genes, enrichment of uncharacterized genes and viral hallmark gene. These features make the identification more accurate but it still suffer limitations. One of the limitations is the requirements of having at least 3 genes within the contig because the smallest virus genome contains 3 genes because the smallest virus discovered has 3 genes only so it has the same limitations as previous techniques because of using homology strategy. Moreover, it cannot work with short fragments or contigs and it is very slow in processing metagenomic datasets. 
 
 Recently VirFinder \cite{ren2017virfinder} applied machine learning techniques. VirFinder is a statistical method based on the logistic regression model. It uses the K-mer feature which is considered as a discrimination feature for different sequence problems. It shows a great success with short sequences too and They found a great k-mer similarity score with viruses within other prokaryotic genomes. 
 
 % need to write deep learning techniques in fragments classification
 
-In this paper, we are using deep learning techniques which is much more suitable to sequence problems and also shows significant improvements to other machine learning models. In deep neural networks, the model will extract the most appropriate features during training which lead to better identification accuracy. 
+In this paper, we are using deep learning techniques which is much more suitable to sequence problems and also shows significant improvements to other current machine learning models. In deep neural networks, the model will extract the most appropriate features during training which lead to better identification accuracy and sensitivity. 
 
 \section{Materials and Methods}
 
 \subsection{Building training and testing dataset}
-We downloaded viruses, bacteria and archaea genomes from RefSeq database then we divided them randomly into a train and test genomes with 80\% of total base pairs in training. Table \ref{table:genome_stats} shows the number of genomes we used in training and testing. We used all available viral genomes until Nov. \nth{1}, 2017 and a sample from prokaryotic genomes due to the huge number of available prokaryotic genomes. Then, we converted the viral genomes into non-overlapping fragments of different lengths n = \{100, 500, 1000, 3000\}. We generated an approximate number of non-overlapping fragments of prokaryotic genomes with the same lengths randomly as well. (Table \ref{table:fragments_stats}). We balanced the data of both classes using random under-sampling technique to avoid the deep neural network bias to the majority class. Figure \ref{fig:data_pipline} shows more details for data pipeline.
+We downloaded viruses, bacteria and archaea genomes from RefSeq database then we divided them randomly into a train and test genomes with 80\% of total base pairs in training. Table \ref{table:genome_stats} shows the number of genomes we used in training and testing. We processed all available viral genomes until Nov. \nth{1}, 2017 and a sample from prokaryotic genomes due to the huge number of available prokaryotic genomes. Then, we converted the viral genomes into non-overlapping fragments of different lengths n = \{100, 500, 1000, 3000\}. We generated an approximate number of non-overlapping fragments of prokaryotic genomes with the same lengths randomly as well. (Table \ref{table:fragments_stats}). We balanced the data of both classes using random under-sampling technique to avoid the bias to the majority class with the deep neural network. Figure \ref{fig:data_pipline} shows more details for data pipeline.
 
-\begin{figure}
+\begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=\columnwidth]{imgs/data_pipeline.PNG}
 	\caption{VirNet Data Pipeline}
 	\label{fig:data_pipline}
 \end{figure}
 
-\begin{table}[h!]
+\begin{table}[!htbp]
 	\centering
 	\begin{tabular}{||c c c c||} 
 		Genome & Train & Test & Total \\ [0.5ex] 
@@ -146,9 +148,9 @@ We downloaded viruses, bacteria and archaea genomes from RefSeq database then we
 
 \subsection{Generating simulated virome and microbiome}
 Grinder \cite{angly2012grinder} is an open-source tool commonly used for generating a simulate amplicon and shotgun metagenomic datasets from reference genomes. 
-We generated two metagenomic data of virome and microbiome of 1M reads and fragment length 100bp using Grinder with our reference test genomes to simulate shotgun metagenomic sequences in order to verify the ability of our tool to work on metagenomic data instead of fragments from the genomes. Moreover, we used Illumina error model indicated by mutation\_dist poly4 3e-3 3.3e-8 and mutation ratio 91:9 (9 indels for each 91 substitution mutations) because for Illumina indel errors occur more often than substitution errors \cite{laehnemann2015denoising}. Table \ref{table:simulate_stats} shows simulated data statistics.  \\
+We generated two metagenomic data of virome and microbiome of 1M reads and fragment length 100bp using Grinder with our reference test genomes to simulate shotgun metagenomic sequences in order to verify the ability of our tool to detect viral reads in metagenomic data instead of generated fragments from the reference genomes. The virome data has 75\% of viral reads while microbiome has 25\%. Moreover, we used Illumina error model indicated by mutation\_dist poly4 3e-3 3.3e-8 and mutation ratio 91:9 (9 indels for each 91 substitution mutations) because for Illumina indel errors occur more often than substitution errors \cite{laehnemann2015denoising}. Table \ref{table:simulate_stats} shows simulated data statistics.  \\
 
-\begin{table}[h!]
+\begin{table}[!htbp]
 	\centering
 	\begin{tabular}{||c c c||} 
 		& Microbiome & Virome \\ [0.5ex] 
@@ -177,14 +179,13 @@ We generated two metagenomic data of virome and microbiome of 1M reads and fragm
 %Our tool is able to read not only fasta files and fastq files. Furthermore, it is able to deal with paired-end reads i.e. if one of the two pairs is identified as a virus, the other should be the same. If there are conflicts between the classifications of the two pairs; this pair could be denoted as ambiguous.
 
 \subsection{Deep Learning Model}
-The deep learning model is implemented as an attentional encoder network (Figure \ref{fig:encoder}). An input sequence  $\mathbf{x = (x_{1} , \ldots{} , x_{m} )}$  and calculates a forward sequence of hidden states  ($\mathbf{\overrightarrow{h_{1}}}$,\ldots{},$\mathbf{ \overrightarrow{h_{m}}}$). The hidden states $\mathbf{\overrightarrow{h_{j}}}$  are averaged to obtain the attention vector $\mathbf{h_{j}}$ representing the context vector from the input sequence.
-
-Embedding Layer maps discrete input words to dense vectors for computational efficiency before feeding this sequence to LSTM/GRU Layers. The attentional network could learn how to extract suitable features from the raw data and can attend to previous DNA nucleotide within the same input sequence. 
-
 Recurrent neural networks (RNN), long short-term memory (LSTM) \cite{hochreiter1997long} and gated recurrent neural networks (GRU) \cite{chung2014empirical} can model complex sequences and have been used for sequence modeling problems.
 
+Our deep learning model is implemented as an attentional encoder network (Figure \ref{fig:encoder}). An input sequence  $\mathbf{x = (x_{1} , \ldots{} , x_{m} )}$  and calculates a forward sequence of hidden states  ($\mathbf{\overrightarrow{h_{1}}}$,\ldots{},$\mathbf{ \overrightarrow{h_{m}}}$). The hidden states $\mathbf{\overrightarrow{h_{j}}}$  are averaged to obtain the attention vector $\mathbf{h_{j}}$ representing the context vector from the input sequence.
 
-LSTM encoder have 3 gates to protect and control the cell state, the input gate denoted $\mathbf{i}$ which defines how much of the newly computed state you want to let through, forget gate denoted $\mathbf{f}$ that decides what information is to be kept and what is to be thrown away ,  the output of the update gate denoted $\mathbf{U}$ that's used to update the cell state and the output of the LSTM cell $\mathbf{o}$ .$\mathbf{W}$ is the recurrent connection at the previous hidden layer and current hidden layer and $\mathbf{C}$ is the internal memory of the unit  as shown in the following equations \newline
+Embedding layer maps discrete input words to dense vectors for computational efficiency before feeding this sequence to LSTM/GRU Layers. The attentional network could learn how to extract suitable features from the raw data and can attend to previous DNA nucleotide within the same input sequence. 
+
+LSTM encoder have 3 gates to protect and control the cell state, the input gate denoted $\mathbf{i}$ which defines how much of the newly computed state you want to let through, forget gate denoted $\mathbf{f}$ that decides what information is to be kept and what is to be thrown away,  the output of the update gate denoted $\mathbf{U}$ that's used to update the cell state and the output of the LSTM cell $\mathbf{o}$ .$\mathbf{W}$ is the recurrent connection at the previous hidden layer and current hidden layer and $\mathbf{C}$ is the internal memory of the unit  as shown in the following equations \newline
 $\mathbf{i_{t}=\sigma(x_{t}U^i + h_{t-1}W^i)}$ \newline
 $\mathbf{f_{t}=\sigma(x_{t}U^f + h_{t-1}W^f)}$ \newline
 $\mathbf{o_{t}=\sigma(x_{t}U^o + h_{t-1}W^o)}$. 
@@ -196,13 +197,13 @@ $\mathbf{\overline{h_{t}} = tanh(x_{t}U^h + (r_{t} * h_{t-1})W^h )}$ \newline
 $\mathbf{ h_{t} = (1-z_{t})h_{t-1} +z_{t}\overline{h_{t}}}$.
 
 
-The attentional neural model was trained with the DNA nucleotide bases with 100bp fragments. The model will then try to predict in a binary format whether this fragment is viral or non-viral.
+The attentional neural model was trained with the DNA nucleotide bases with fragments with different lengths. The model will predict in a binary output format whether this fragment is viral or non-viral.
 
 The top-performing model (Figure \ref{fig:model_diagram}) consists of an input embedding layer of size 128 mapping input DNA nucleotide tokens into an embedding space, that is fed to an LSTM layer. The forward sequence $\mathbf{\overrightarrow{h_{j}}}$ is then averaged together to create an attentional vector representing token context within the same fragment. A dropout layer was added after the attentional layer to avoid overfitting over the input data.
 
-LSTM layer was performing better as in \ref{table:hyper_results} than the GRU cell.GRU encoder having less gates than LSTM model make it faster and easier to converge , but depedending on the size and the format of the input data LSTM with more gates would be slower but will outperform GRU encoder type.
+LSTM layer was performing better as in \ref{table:hyper_results} than the GRU cell. GRU encoder having less gates than LSTM model make it faster and easier to converge, but depedending on the size and the format of the input data. LSTM with more gates would be slower but will outperform GRU encoder type.
 
-The input sequence is divided into 5 grams sized tokens these tokens are then treated as a single word.This single token is mapped as a point in the embedding space created during training the neural model.
+The input sequence is divided into 5 grams sized tokens these tokens are then treated as a single word (Figure \ref{fig:encoder}). This single token is mapped as a point in the embedding space created during training the neural model.
 
 During training, all parameters are optimized jointly using Adam to maximize the conditional probability of tokens found together to predict if an input sequence is viral or not.
 
@@ -210,11 +211,11 @@ In this model, an early stopping mechanism was used as a form of regularization 
 
 \subsection{Hyperparameters optimization}
 
-Model parameters affect the performance of the deep learning model, and they control the behavior of the training algorithm as well. We selected the grid search technique in order to find the most suitable parameters. The grid search is considered a traditional technique for hyperparameters optimization and it brute force different combinations. We ran several experiments on 20\% of our training set for 500 bp. Then, we divided it into training, validation, and testing set with the following percentages 70\%, 10\%, and 20\%. These experiments were designed to find the best parameters for the number of recurrent layers, the embedding size for each layer and the input sub-words (ngram). Our reported results (Table \ref{table:hyper_results}) shows that the best parameters setup was for 2 layers, 128 embedding size, and 5 ngram. 
+Model parameters affect the performance of the deep learning model, and they control the behavior of the training algorithm as well. We selected the grid search technique in order to find the most suitable parameters. The grid search is considered a traditional technique for hyperparameters optimization and it brute force different combinations. We ran several experiments on 20\% of our training set for 500 bp. Then, we divided it into training, validation, and testing set with the following percentages 70\%, 10\%, and 20\%. These experiments were designed to find the best parameters for the number of recurrent layers, the embedding size for each layer and the input sub-words (ngram). Our reported results (Table \ref{table:hyper_results}) show that the best parameters setup is for 2 layers, 128 embedding size, and 5 ngram. 
 
-We ran other experiments with the same parameters to check the ability of our model with other configuration, so we changed different parameters separately such as embedding size to 256 neurons, the number of layers to 3 and the recurrent cell type to GRU instead of LSTM. We found a slightly less accuracy and roc-auc scores but the training time was much more than the best parameters configuration as expected due to increasing number of neural network parameters.
+We ran other experiments with the same parameters to check the ability of our model with other configuration, so we changed different parameters separately such as embedding size to 256 neurons, the number of layers to 3 and the recurrent cell type to GRU instead of LSTM. We found a slightly less accuracy and ROC-AUC scores but the training time was much more than the best parameters configuration as expected due to increasing number of neural network parameters.
 
-\begin{table}[h!]
+\begin{table}[!htbp]
 	\centering
 	\begin{tabular}{||c c c c c||} 
 		\#Layers & Embedding (\#Neurons) & Ngram & ROC-AUC & Accuracy \\ [0.5ex] 
@@ -243,7 +244,7 @@ We ran other experiments with the same parameters to check the ability of our mo
 \end{table}
 
 
-\begin{figure}
+\begin{figure}[!htbp]
 	\centering
 	\begin{subfigure}{0.4\textwidth}
 		\includegraphics[width=\linewidth]{imgs/encoder.PNG}
@@ -263,7 +264,7 @@ We ran other experiments with the same parameters to check the ability of our mo
 \section{Results}
 
 \subsection{Results for generated fragments}
-We tested VirNet on different lengths of fragments n= \{100, 500, 1000, 3000\} from our testing set of viruses and prokaryotes RefSeq genomes. Moreover, we compared the output results to VirFinder results on the same training and testing data. VirNet predictions outperformed VirFinder for fragments with length 500, 1000 and 3000 (Figure \ref{fig:accuracy_graph}). The model reached to 82.82\% of accuracy whereas VirFinder tool obtained 75.61\%. Moreover, VirFinder can perdict the short fragments with length 100. Figures \ref{fig:roc_auc_virfindera} and \ref{fig:roc_auc_virneta} shows roc-auc curves of both tools on the testing set. Table \ref{table:virfinder_results} shows the comparison between both tools in terms of accuracy, precision, recall and roc-auc scores.
+We tested VirNet on different lengths of fragments n= \{100, 500, 1000, 3000\} from our testing set of viruses and prokaryotes RefSeq genomes. Moreover, we compared the output results to VirFinder results on the same training and testing data. VirNet predictions outperformed VirFinder for fragments with length 500, 1000 and 3000 (Figure \ref{fig:accuracy_graph}). The model reached to 82.82\% of accuracy whereas VirFinder tool obtained 75.61\%. Moreover, VirFinder can perdict the short fragments with length 100. Figures \ref{fig:roc_auc_virfindera} and \ref{fig:roc_auc_virneta} shows ROC-AUC curves of both tools on the testing set. Table \ref{table:virfinder_results} shows the comparison between both tools in terms of accuracy, average precision and average recall.
 
 %\begin{table}[h!]
 %	\centering
@@ -280,7 +281,7 @@ We tested VirNet on different lengths of fragments n= \{100, 500, 1000, 3000\} f
 %	\label{table:virfinder_results}
 %\end{table}
 
-\begin{table}[h!]
+\begin{table}[!htbp]
 	\centering
 	\begin{tabular}{||c l l l l l l||} 
 		Length(N) &	\multicolumn{2}{l}{Accuracy} & \multicolumn{2}{l}{Avg. Precision} & \multicolumn{2}{l}{Avg. Recall}\\ [0.5ex] 
@@ -297,7 +298,7 @@ We tested VirNet on different lengths of fragments n= \{100, 500, 1000, 3000\} f
 
 \subsection{Results for simulated metagenomes}
 
-As mentioned before, we tested VirNet on a simulated metagenomes of 100 bp and we found that VirNet performed much better than VirFinder. VirNet shows accuracy is 70\% while VirFinder is 62.77\% on the virome data and 64.49\% on the microbiome data (Figure \ref{fig:roc_auc_virfinderb} and Table \ref{table:virfinder_results_simulated}).
+As mentioned before, we tested VirNet on a simulated metagenomes of 100 bp and we found that VirNet performed much better than VirFinder. VirNet shows accuracy is 71.3\% on the virome data and 72.14\% on the microbiome data while VirFinder is 62.77\% on the virome data and 64.49\% on the microbiome data Table \ref{table:virfinder_results_simulated}). The ROC-AUC curves of both tools shows the difference between them (Figures \ref{fig:roc_auc_virfinderb} and \ref{fig:roc_auc_virnetb}).
 
 \begin{figure}
 	\centering
@@ -307,37 +308,37 @@ As mentioned before, we tested VirNet on a simulated metagenomes of 100 bp and w
 \end{figure}
 
 
-\begin{figure}
+\begin{figure}[!htbp]
 	\centering
 \begin{subfigure}{0.3\textwidth}
 	\includegraphics[width=\linewidth]{imgs/roc_auc.png}
-	\caption{VirFinder performance on generated fragments} 
+	\caption{VirFinder with generated fragments} 
 	\label{fig:roc_auc_virfindera}
 \end{subfigure}
 \begin{subfigure}{0.3\textwidth}
 	\includegraphics[width=\linewidth]{imgs/virnet_roc_auc.png}
-	\caption{VirNet performance on generated fragments} 
+	\caption{VirNet with generated fragments} 
 	\label{fig:roc_auc_virneta}
 \end{subfigure}
 \begin{subfigure}{0.3\textwidth}
 	\includegraphics[width=\linewidth]{imgs/roc_auc_simulated.png}
-	\caption{VirFinder performance on the simulated genomes} 
+	\caption{VirFinder with simulated genomes} 
 	\label{fig:roc_auc_virfinderb}
 \end{subfigure}
 \begin{subfigure}{0.3\textwidth}
 	\includegraphics[width=\linewidth]{imgs/virnet_roc_auc_simulated.png}
-	\caption{VirNet performance on the simulated genomes} 
+	\caption{VirNet with simulated genomes} 
 	\label{fig:roc_auc_virnetb}
 \end{subfigure}
-\caption{VirFinder ROC-AUC curves on fragments and simulated metagenomes} 
+\caption{ROC-AUC curves on fragments and simulated metagenomes} 
 \label{fig:roc_auc_virfinder}
 \end{figure}
 
 
 
-\begin{table}[h!]
+\begin{table}[!htbp]
 	\centering
-	\begin{tabular}{||c l l l l l l||} 
+	\begin{tabular}{||l l l l l l l||} 
 	Metagenome &	\multicolumn{2}{l}{Accuracy} & \multicolumn{2}{l}{Avg. Precision} & \multicolumn{2}{l}{Avg. Recall}\\ [0.5ex] 
 	& VirNet & VirFinder & VirNet & VirFinder & VirNet & VirFinder \\
 		\hline\hline
@@ -348,24 +349,25 @@ As mentioned before, we tested VirNet on a simulated metagenomes of 100 bp and w
 	\label{table:virfinder_results_simulated}
 \end{table}
 
-\subsection{VirNet processing speed}
-Using GPUs is an advantage for our tool and make it very fast and scalable with a large number of reads and fragments. The training process is around 5 hours with 2 million reads and the prediction is 30 seconds on 1 million reads using Nvidia GeForce GTX 1080 Ti. On the other hand, VirFinder processing the reads on a single CPU less than VirNet by around 82 times. We can avoid that by using parallel CPU threads for VirFinder but in case you want to retrain it with new data, it will take a few days.
+%\subsection{VirNet processing speed}
+%Using GPUs is an advantage for our tool and make it very fast and scalable in processing massive amount of metagenomic reads simultaneously. The training process is around 5 hours with 2 million reads, while the prediction process is around 30 seconds on 1 million reads using Nvidia GeForce GTX 1080 Ti. On the other hand, VirFinder processing the reads on a single CPU less than VirNet by around 82 times. We can avoid that by using parallel CPU threads for VirFinder but in case you want to retrain it with new data, it will take a couple of days.
 
 \section{Discussion}
 
-In our tool, there are no handmade features as the network will learn how to extract appropriate features for the raw data. It shows better accuracy as it is trained with the updated viral databases with a good statistical model. This helps us to generalize this model with all genomes and to make a generalized model for sequence classification. We also able to identify the short viral sequences as LSTM learns from the dependences between the input sequence. 
+In our tool, there are no handmade features as the network will learn how to extract appropriate features of the raw data. It shows better accuracy as it is trained with the updated viral databases with a good statistical model. This helps us to generalize this model with all genomes and to make a generalized model for sequence classification. We are also able to identify the short viral sequences as LSTM learns from the dependences between the input sequence. 
 
-There is no evidence that these training prokaryotic genomes don't have a viral infection or not. Cleaning the training genomes would give us better accuracy but based on sampling and randomizing prokaryotic fragments, our training data might not contain proviruses. 
+There is no evidence that these training prokaryotic genomes don't have a viral infection or not. Cleaning the training genomes might give us better accuracy but based on sampling and randomizing prokaryotic fragments, our training data may not contain proviruses. 
 
-For the trained deep learning model, using a sliding window over the input DNA sequence might improve our model , the only drawback of this technique is the slow train and inference time of input sequences, Also using an adaptive learning rate decaying over time steps during the training might improve the model performance, but will need more tuning over the input data.
+For the trained deep learning model, using a sliding window over the input DNA sequence might improve our model, the only drawback of this technique is the slow train and inference time of input sequences, Also using an adaptive learning rate decaying over time steps during the training might improve the model performance, but will need more tuning over the input data.
 
 \section{Conclusion}
 
 This attentional neural deep learning network was able to achieve state of the art results on viral identification from high throughput sequences. Our approach is able to classify short fragments as well. Experimental results validate our approach for identification with an accuracy of more than 83\%. According to these results, Our model would help us in understanding viruses in various microbial communities and discovering new species of viruses.
 
+
 \section*{Acknowledgments}
 
-We acknowledge Eng. Mayada Elsayed for designing the figures and Dr. Kiran Natra for the support.  
+We acknowledge Eng. Mayada Elsayed for designing the figures.
 
 
 \section*{Availability of data}
