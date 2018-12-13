@@ -1,0 +1,30 @@
+\begin{thebibliography}{3}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Arnold et~al.(1998)Arnold, Wilson, and Boshier]{Reference3}
+A.~S. Arnold, J.~S. Wilson, and M.~G. Boshier.
+\newblock A simple extended-cavity diode laser.
+\newblock \emph{Review of Scientific Instruments}, 69\penalty0 (3):\penalty0
+  1236--1239, March 1998.
+\newblock URL \url{http://link.aip.org/link/?RSI/69/1236/1}.
+
+\bibitem[Wieman and Hollberg(1991)]{Reference2}
+Carl~E. Wieman and Leo Hollberg.
+\newblock Using diode lasers for atomic physics.
+\newblock \emph{Review of Scientific Instruments}, 62\penalty0 (1):\penalty0
+  1--20, January 1991.
+\newblock URL \url{http://link.aip.org/link/?RSI/62/1/1}.
+
+\bibitem[Hawthorn et~al.(2001)Hawthorn, Weber, and Scholten]{Reference1}
+C.~J. Hawthorn, K.~P. Weber, and R.~E. Scholten.
+\newblock Littrow configuration tunable external cavity diode laser with fixed
+  direction output beam.
+\newblock \emph{Review of Scientific Instruments}, 72\penalty0 (12):\penalty0
+  4477--4479, December 2001.
+\newblock URL \url{http://link.aip.org/link/?RSI/72/4477/1}.
+
+\end{thebibliography}

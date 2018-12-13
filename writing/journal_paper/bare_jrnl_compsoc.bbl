@@ -1,0 +1,124 @@
+\begin{thebibliography}{10}
+
+\bibitem{akhter2012phispy}
+Sajia Akhter, Ramy~K Aziz, and Robert~A Edwards.
+\newblock Phispy: a novel algorithm for finding prophages in bacterial genomes
+  that combines similarity-and composition-based strategies.
+\newblock {\em Nucleic acids research}, 40(16):e126--e126, 2012.
+
+\bibitem{allali2017comparison}
+Imane Allali, Jason~W Arnold, Jeffrey Roach, Maria~Belen Cadenas, Natasha Butz,
+  Hosni~M Hassan, Matthew Koci, Anne Ballou, Mary Mendoza, Rizwana Ali, et~al.
+\newblock A comparison of sequencing platforms and bioinformatics pipelines for
+  compositional analysis of the gut microbiome.
+\newblock {\em BMC microbiology}, 17(1):194, 2017.
+
+\bibitem{angermueller2016deep}
+Christof Angermueller, Tanel P{\"a}rnamaa, Leopold Parts, and Oliver Stegle.
+\newblock Deep learning for computational biology.
+\newblock {\em Molecular systems biology}, 12(7):878, 2016.
+
+\bibitem{angly2012grinder}
+Florent~E Angly, Dana Willner, Forest Rohwer, Philip Hugenholtz, and Gene~W
+  Tyson.
+\newblock Grinder: a versatile amplicon and shotgun sequence simulator.
+\newblock {\em Nucleic acids research}, 40(12):e94--e94, 2012.
+
+\bibitem{buchfink2014Diamond}
+Benjamin Buchfink, Chao Xie, and Daniel~H Huson.
+\newblock Fast and sensitive protein alignment using diamond.
+\newblock {\em Nature methods}, 12(1):59, 2014.
+
+\bibitem{chung2014empirical}
+Junyoung Chung, Caglar Gulcehre, KyungHyun Cho, and Yoshua Bengio.
+\newblock Empirical evaluation of gated recurrent neural networks on sequence
+  modeling.
+\newblock {\em arXiv preprint arXiv:1412.3555}, 2014.
+
+\bibitem{fouts2006phage_finder}
+Derrick~E Fouts.
+\newblock Phage\_finder: automated identification and classification of
+  prophage regions in complete bacterial genome sequences.
+\newblock {\em Nucleic acids research}, 34(20):5839--5851, 2006.
+
+\bibitem{hochreiter1997long}
+Sepp Hochreiter and J{\"u}rgen Schmidhuber.
+\newblock Long short-term memory.
+\newblock {\em Neural computation}, 9(8):1735--1780, 1997.
+
+\bibitem{izard2014metagenomics}
+Jacques Izard and Maria Rivera.
+\newblock {\em Metagenomics for Microbiology}.
+\newblock Academic Press, 2014.
+
+\bibitem{kim2016centrifuge}
+Daehwan Kim, Li~Song, Florian~P Breitwieser, and Steven~L Salzberg.
+\newblock Centrifuge: rapid and sensitive classification of metagenomic
+  sequences.
+\newblock {\em Genome research}, 2016.
+
+\bibitem{labonte2015single}
+Jessica~M Labont{\'e}, Brandon~K Swan, Bonnie Poulos, Haiwei Luo, Sergey Koren,
+  Steven~J Hallam, Matthew~B Sullivan, Tanja Woyke, K~Eric Wommack, and Ramunas
+  Stepanauskas.
+\newblock Single-cell genomics-based analysis of virus--host interactions in
+  marine surface bacterioplankton.
+\newblock {\em The ISME journal}, 9(11):2386, 2015.
+
+\bibitem{laehnemann2015denoising}
+David Laehnemann, Arndt Borkhardt, and Alice~Carolyn McHardy.
+\newblock Denoising dna deep sequencing data—high-throughput sequencing
+  errors and their correction.
+\newblock {\em Briefings in bioinformatics}, 17(1):154--179, 2015.
+
+\bibitem{lima2008prophinder}
+Gipsi Lima-Mendez, Jacques Van~Helden, Ariane Toussaint, and Rapha{\"e}l
+  Leplae.
+\newblock Prophinder: a computational tool for prophage prediction in
+  prokaryotic genomes.
+\newblock {\em Bioinformatics}, 24(6):863--865, 2008.
+
+\bibitem{minot2011human}
+Samuel Minot, Rohini Sinha, Jun Chen, Hongzhe Li, Sue~A Keilbaugh, Gary~D Wu,
+  James~D Lewis, and Frederic~D Bushman.
+\newblock The human gut virome: inter-individual variation and dynamic response
+  to diet.
+\newblock {\em Genome research}, 2011.
+
+\bibitem{ren2017virfinder}
+Jie Ren, Nathan~A Ahlgren, Yang~Young Lu, Jed~A Fuhrman, and Fengzhu Sun.
+\newblock Virfinder: a novel k-mer based tool for identifying viral sequences
+  from assembled metagenomic data.
+\newblock {\em Microbiome}, 5(1):69, 2017.
+
+\bibitem{roux2015virsorter}
+Simon Roux, Francois Enault, Bonnie~L Hurwitz, and Matthew~B Sullivan.
+\newblock Virsorter: mining viral signal from microbial genomic data.
+\newblock {\em PeerJ}, 3:e985, 2015.
+
+\bibitem{roux2011metavir}
+Simon Roux, Micha{\"e}l Faubladier, Antoine Mahul, Nils Paulhe, Aur{\'e}lien
+  Bernard, Didier Debroas, and Fran{\c{c}}ois Enault.
+\newblock Metavir: a web server dedicated to virome analysis.
+\newblock {\em Bioinformatics}, 27(21):3074--3075, 2011.
+
+\bibitem{roux2015viral}
+Simon Roux, Steven~J Hallam, Tanja Woyke, and Matthew~B Sullivan.
+\newblock Viral dark matter and virus--host interactions resolved from publicly
+  available microbial genomes.
+\newblock {\em Elife}, 4:e08490, 2015.
+
+\bibitem{wommack2012virome}
+K~Eric Wommack, Jaysheel Bhavsar, Shawn~W Polson, Jing Chen, Michael Dumas,
+  Sharath Srinivasiah, Megan Furman, Sanchita Jamindar, and Daniel~J Nasko.
+\newblock Virome: a standard operating procedure for analysis of viral
+  metagenome sequences.
+\newblock {\em Standards in genomic sciences}, 6(3):421, 2012.
+
+\bibitem{zhou2011phast}
+You Zhou, Yongjie Liang, Karlene~H Lynch, Jonathan~J Dennis, and David~S
+  Wishart.
+\newblock Phast: a fast phage search tool.
+\newblock {\em Nucleic acids research}, 39(suppl\_2):W347--W352, 2011.
+
+\end{thebibliography}
