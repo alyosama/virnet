@@ -13,7 +13,7 @@ from Bio import SeqIO
 MIN_DIM = 500
 
 parser = argparse.ArgumentParser(description='VirNet a deep neural network model for virus identification')
-parser.add_argument('--model_path', dest='model_path', default='data/model.h5', help='the path of the model')
+parser.add_argument('--model_path', dest='model_path', default='data\saved_model\model_500.h5', help='the path of the model')
 parser.add_argument('--type', dest='input_type', default='fasta', help='choose the input type fasta, fastq or CSV')
 parser.add_argument('--input', dest='input_path', help='input file')
 parser.add_argument('--output', dest='output_path', default='output.csv', help='output file csv')

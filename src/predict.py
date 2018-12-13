@@ -1,9 +1,3 @@
-## TO CALL 
-# 
-# 
-# 
-# python predict.py --input_dim=3000 --input=../../data/3-fragments/fna/viral_test.fna_3000.fna --output=../../benchmark/vir_results/viral_test.fna_3000.fna --model_path=../../work_dir/models/saved_model/model_3000.h5
-
 import os
 import re
 import random
@@ -20,36 +14,15 @@ from Bio import SeqIO
 from sklearn.metrics import classification_report,roc_auc_score,accuracy_score,roc_curve, auc
 from imblearn.under_sampling import RandomUnderSampler
 from NNClassifier import NeuralClassifier
+from constants import c
 
 parser = argparse.ArgumentParser(description='VirNet a deep neural network model for virus identification')
 parser.add_argument('--input_dim', dest='input_dim', type=int, default=500, help='input dim (default: 500)')
-parser.add_argument('--cell_type', dest='model_name', default='lstm', help='model type which is lstm,gru,rnn (default: lstm)')
-parser.add_argument('--batch_size', dest='batch_size', type=int, default=256, help='Batch size (default: 256)')
-parser.add_argument('--n_layers', dest='n_layers', type=int, default=2, help='number of layers(default: 2)')
-parser.add_argument('--lr', dest='lr', type=float, default=0.001, help='learning rate(default: 0.001)')
-parser.add_argument('--epoch', dest='ep', type=int, default=30, help='number of epochs(default: 30)')
-parser.add_argument('--patience',dest='pt',type=int, default=5, help='number of declining epochs before choosing the best epoch for saving')
-parser.add_argument('--embed_size',dest='embs',type=int, default=128,help='Size of Embedding layer of input tokens (128)')
-parser.add_argument('--ngrams', dest='ngrams', type=int, default=5, help='number of substring used in each sequence (3) ')
-parser.add_argument('--work_dir', dest='work_dir', default='../../work_dir', help='Training Work dir')
 parser.add_argument('--input', dest='input_path', help='input file')
 parser.add_argument('--output', dest='output_path', default='output.csv', help='output file csv')
-parser.add_argument('--model_path', dest='model_path', help='the path of the model')
-parser.add_argument('--data', dest='data', default='../../data/3-fragments/fna', help='train mode  Training and Testing data dir')
-
-
-######### PARAMS #############
+parser.add_argument('--model_path', dest='model_path',default='data/saved_model/model_{}.h5', help='the path of the model')
 args = parser.parse_args()
-genomes=['non_viral','viral']
-model_name=args.model_name
-input_dim=args.input_dim
-output_dim=1
-data_dir=args.data
-data_file='{0}_{1}.fna_{2}.fna'
 
-
-######## FILE PATHS ##########
-experiment_name='{0}_I{1}_L{2}'.format(model_name,input_dim,args.n_layers)
 
 def load_data(data_path):
     def clean_seq(seq):
@@ -95,68 +68,19 @@ def save_pred(input_data,predictions,output_path):
     df['result']=predict_classes(predictions)
     df.to_csv(output_path)
 
-def load_vocab():
-    def load_fasta(file_path):
-        data_list=[]
-        for record in SeqIO.parse(file_path, "fasta"):
-            data_list.append([record.id,str(record.seq)])
-        print('Loaded {0} fragments from {1}'.format(len(data_list),file_path))
-
-        df=pd.DataFrame(data_list,columns=['ID','SEQ'])
-        return df
-    
-    def clean_seq(seq):
-        return re.sub(r'[^ATGCN]','N',seq.upper())
-
-    def load_csv_fragments(genome,ty,input_dim):
-        data_path=os.path.join(data_dir,data_file.format(genome,ty,input_dim))
-        #df=pd.read_csv(data_path)
-        df=load_fasta(data_path)
-        df['SEQ']=df['SEQ'].apply(clean_seq)
-        if genome == 'viral':
-            df['LABEL']=1
-        else:
-            df['LABEL']=0
-        return df
-        
-    print('Loading training and testing data')
-    train_list=[]
-    test_list=[]
-    for genome in genomes:
-        train_list.append(load_csv_fragments(genome,'train',input_dim))
-        test_list.append(load_csv_fragments(genome,'test',input_dim))
-
-    df_train=pd.concat(train_list)
-    df_test=pd.concat(test_list)
-
-    ## SHUFFLE TRAINING DATA
-    df_train=df_train.sample(frac=1).reset_index(drop=True)  
-    print('Training len {0}'.format(len(df_train)))
-    print('Testing len {0}'.format(len(df_test)))
-    
-    return df_train,df_test
-
-
 def main():
-    print('Starting Experiment {0}'.format(experiment_name))
-
-    # Load Data
-    df_data=load_data(args.input_path)
+    print('Starting VirNet')
 
     # Create Model
     print('Loading Model')
-    model = NeuralClassifier(exp_name=experiment_name, type=args.model_name, nepochs=args.ep, patience=args.pt, l_rate=args.lr,\
-    batch_size=args.batch_size, embed_size=args.embs,\
-    nlayers=args.n_layers, maxlen = int(math.ceil(args.input_dim * 1.0 / args.ngrams)))
-
-    # Prepare Vocab
-    df_train,df_test=load_vocab()
-    X_train,X_test = model.tokenize_set(df_train['SEQ'].values,df_test['SEQ'].values,ngrams=args.ngrams)
+    model = NeuralClassifier(input_dim=args.input_dim,ngrams=c.MODEL.ngrams)
 
     ## Load Testing Data
-    x_data = model.tokenize(df_data['SEQ'].values,ngrams=args.ngrams)
+    df_data=load_data(args.input_path)
+    x_data = model.tokenize(df_data['SEQ'].values,ngrams=c.MODEL.ngrams)
 
-    model.load_model(args.model_path)
+
+    model.load_model(args.model_path.format(args.input_dim))
 
     predictions=run_pred(model,x_data)
     save_pred(df_data,predictions,args.output_path)

@@ -3,29 +3,35 @@
 \contentsline {chapter}{List of Tables}{xv}{dummy.7}
 \contentsline {chapter}{Abbreviations}{xvi}{dummy.9}
 \contentsline {chapter}{Symbols}{xvii}{dummy.12}
-\contentsline {chapter}{\numberline {1}Chapter Title Here}{1}{chapter.15}
-\contentsline {section}{\numberline {1.1}Welcome and Thank You}{1}{section.16}
-\contentsline {section}{\numberline {1.2}Learning \LaTeX {}}{1}{section.17}
-\contentsline {subsection}{\numberline {1.2.1}A (not so short) Introduction to \LaTeX {}}{2}{subsection.18}
-\contentsline {subsection}{\numberline {1.2.2}A Short Math Guide for \LaTeX {}}{2}{subsection.19}
-\contentsline {subsection}{\numberline {1.2.3}Common \LaTeX {} Math Symbols}{2}{subsection.20}
-\contentsline {subsection}{\numberline {1.2.4}\LaTeX {} on a Mac}{3}{subsection.21}
-\contentsline {section}{\numberline {1.3}Getting Started with this Template}{3}{section.22}
-\contentsline {subsection}{\numberline {1.3.1}About this Template}{3}{subsection.23}
-\contentsline {section}{\numberline {1.4}What this Template Includes}{4}{section.24}
-\contentsline {subsection}{\numberline {1.4.1}Folders}{4}{subsection.25}
-\contentsline {subsection}{\numberline {1.4.2}Files}{5}{subsection.26}
-\contentsline {section}{\numberline {1.5}Filling in the `\texttt {Thesis.cls}' File}{7}{section.27}
-\contentsline {section}{\numberline {1.6}The `\texttt {Thesis.tex}' File Explained}{7}{section.28}
-\contentsline {section}{\numberline {1.7}Thesis Features and Conventions}{8}{section.29}
-\contentsline {subsection}{\numberline {1.7.1}Printing Format}{9}{subsection.30}
-\contentsline {subsection}{\numberline {1.7.2}Using US Letter Paper}{9}{subsection.31}
-\contentsline {subsection}{\numberline {1.7.3}References}{10}{subsection.32}
-\contentsline {subsection}{\numberline {1.7.4}Figures}{11}{subsection.34}
-\contentsline {subsection}{\numberline {1.7.5}Typesetting mathematics}{12}{subsection.36}
-\contentsline {section}{\numberline {1.8}Sectioning and Subsectioning}{13}{section.38}
-\contentsline {section}{\numberline {1.9}In Closing}{13}{section.39}
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.15}
+\contentsline {section}{\numberline {1.1}Metagenomic analysis}{1}{section.16}
+\contentsline {subsection}{\numberline {1.1.1}Definition}{2}{subsection.17}
+\contentsline {subsection}{\numberline {1.1.2}Microorganism}{2}{subsection.18}
+\contentsline {section}{\numberline {1.2}Viruses}{2}{section.19}
+\contentsline {subsection}{\numberline {1.2.1}Definition}{2}{subsection.20}
+\contentsline {subsection}{\numberline {1.2.2}Importance in clinical and environment}{2}{subsection.21}
+\contentsline {subsection}{\numberline {1.2.3}Identification}{3}{subsection.22}
+\contentsline {section}{\numberline {1.3}Next Generation Sequencing}{3}{section.23}
+\contentsline {subsection}{\numberline {1.3.1}Tools}{3}{subsection.24}
+\contentsline {subsection}{\numberline {1.3.2}Data}{3}{subsection.25}
+\contentsline {section}{\numberline {1.4}Our Contribution}{3}{section.26}
+\contentsline {chapter}{\numberline {2}Related Work}{4}{chapter.27}
+\contentsline {section}{\numberline {2.1}Similarity tools}{4}{section.28}
+\contentsline {section}{\numberline {2.2}Statistical tools}{4}{section.29}
+\contentsline {chapter}{\numberline {3}Deep neural networks for identification}{6}{chapter.30}
+\contentsline {section}{\numberline {3.1}Convolution neural networks}{6}{section.31}
+\contentsline {subsection}{\numberline {3.1.1}Triplet loss mechanism}{6}{subsection.32}
+\contentsline {section}{\numberline {3.2}Sequence neural networks}{6}{section.33}
+\contentsline {subsection}{\numberline {3.2.1}Attention mechanism}{6}{subsection.34}
+\contentsline {chapter}{\numberline {4}Experimental results}{7}{chapter.35}
+\contentsline {section}{\numberline {4.1}Dataset generation}{7}{section.36}
+\contentsline {section}{\numberline {4.2}Simulated Metagenome}{8}{section.37}
+\contentsline {section}{\numberline {4.3}Real metagenome casestudy}{8}{section.38}
+\contentsline {chapter}{\numberline {5}Conclusion and Future Work}{9}{chapter.39}
+\contentsline {section}{\numberline {5.1}Summary}{9}{section.40}
+\contentsline {section}{\numberline {5.2}Conclusion}{10}{section.41}
+\contentsline {section}{\numberline {5.3}Future Work}{10}{section.42}
 \vspace {2em}
-\contentsline {chapter}{\numberline {A}Appendix Title Here}{15}{appendix.40}
+\contentsline {chapter}{\numberline {A}Appendix Title Here}{11}{appendix.43}
 \vspace {2em}
-\contentsline {chapter}{Bibliography}{16}{dummy.41}
+\contentsline {chapter}{Bibliography}{12}{dummy.44}
