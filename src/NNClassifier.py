@@ -134,13 +134,13 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
             self.tokenizer=pickle.load(f)
             self.vocab_size = len(self.tokenizer.word_index)
 
-    def tokenize(self,sentences,ngrams):
+    def tokenize(self,sentences,ngrams=5):
         if self.tokenizer is None:
             self.tokenize_load()
         list_tokenized = self.tokenizer.texts_to_sequences(self.word_break(sentences,ngrams))
         return pad_sequences(list_tokenized , maxlen=self.maxlen)
         
-    def tokenize_set(self,train_sentences,test_sentences,ngrams=3): 	   
+    def tokenize_set(self,train_sentences,test_sentences,ngrams=5): 	   
         self.tokenize_train(list(train_sentences)+list(test_sentences),ngrams)
         X_t =self.tokenize(list(train_sentences),ngrams)	            #train bpe model with input noperations which should be around 32k
         X_te = self.tokenize(list(test_sentences),ngrams)

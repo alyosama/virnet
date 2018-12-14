@@ -42,3 +42,9 @@ def load_data(input_path):
     else:
         print('Not supported input type {0}'.format(input_type))
  
+ 
+def predict_classes(proba,thresh=0.5):
+    if proba.shape[-1] > 1:
+        return proba.argmax(axis=-1)
+    else:
+        return (proba > thresh).astype('int32')
