@@ -40,7 +40,7 @@ http://www.icces.org.eg
 
 ## Reference and Citation
 please cite this paper, if you use our method:
-'''
+```
 @inproceedings{abdelkareem2018virnet,
   title={VirNet: Deep attention model for viral reads identification},
   author={Abdelkareem, Aly O and Khalil, Mahmoud I and Elaraby, Mostafa and Abbas, Hazem and Elbehery, Ali HA},
@@ -49,7 +49,7 @@ please cite this paper, if you use our method:
   year={2018},
   organization={IEEE}
 }
-'''
+```
 
 ## Copyright
 Copyright (C) 2018 Faculty of Engineering, Ain Shams University
