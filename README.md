@@ -13,7 +13,7 @@ To download and install the package
 ```
 git clone https://github.com/alyosama/virnet
 cd virnet
-pip3 install requiremnts.txt
+pip3 install requirments.txt
 
 ```
 
