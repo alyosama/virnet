@@ -40,8 +40,16 @@ http://www.icces.org.eg
 
 ## Reference and Citation
 please cite this paper, if you use our method:
-[Abdelkareem, A., Khalil, M. I., Elaraby. M., Abbas, H. M., & Elbehery, A. H. (2018). VirNet: a deep attention model for viral reads identification, 13th IEEE International Conference on Computer Engineering and Systems (ICCES 2018) ](https://github.com/alyosama/virnet/blob/master/documents/224_CR.pdf##)
-
+'''
+@inproceedings{abdelkareem2018virnet,
+  title={VirNet: Deep attention model for viral reads identification},
+  author={Abdelkareem, Aly O and Khalil, Mahmoud I and Elaraby, Mostafa and Abbas, Hazem and Elbehery, Ali HA},
+  booktitle={2018 13th International Conference on Computer Engineering and Systems (ICCES)},
+  pages={623--626},
+  year={2018},
+  organization={IEEE}
+}
+'''
 
 ## Copyright
 Copyright (C) 2018 Faculty of Engineering, Ain Shams University
