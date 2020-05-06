@@ -22,22 +22,25 @@ from keras import backend as K
 from keras.layers.core import *
 import numpy as np
 import math
+import os
 from AttentionLayer import AttentionWeightedAverage
 from constants import c
 
 class NeuralClassifier(BaseEstimator, ClassifierMixin):
-    def __init__(self,embeddings = None,vocab_size = None,input_dim=500,ngrams=5):
+    def __init__(self,embeddings = None,vocab_size = None,input_dim=500,ngrams=5,  model_dir = 'data/saved_model'):
         """
         Called when initializing the classifier
         """
         self.input_dim=input_dim
         self.maxlen =  int(math.ceil(input_dim * 1.0 / ngrams))
-        self.file_path="../../work_dir/models/model-{val_loss:.2f}.h5"
         self.model = None
         self.embeddings = embeddings 
         self.vocab_size = vocab_size
         self.callbacks_list = []
         self.tokenizer = None
+    
+        self.checkpoint_path="models/model-{val_loss:.2f}.h5"
+        self.tokenize_path = os.path.join(model_dir,'tokenizer_{}.pkl'.format(self.input_dim))
 
     def lstm_model(self):
 
@@ -80,7 +83,9 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
         Note: assert is not a good choice here and you should rather
         use try/except blog with exceptions. This is just for short syntax.
         """
-        checkpoint = ModelCheckpoint(self.file_path, monitor='val_loss', verbose=1, save_best_only=True,save_weights_only = True, mode='min')
+        if not os.path.exists(self.checkpoint_path):
+            os.makedirs(self.checkpoint_path)
+        checkpoint = ModelCheckpoint(self.checkpoint_path, monitor='val_loss', verbose=1, save_best_only=True,save_weights_only = True, mode='min')
         early = EarlyStopping(monitor="val_loss", mode="min", patience=c.TRAINING.patience)
         self.callbacks_list = [early,checkpoint] #early
         self.model = self.lstm_model()
@@ -125,12 +130,13 @@ class NeuralClassifier(BaseEstimator, ClassifierMixin):
             self.embeddings.set_embeddings_matrix(self.tokenizer.word_index,self.vocab_size)
 
     def tokenize_save(self):
-        with open('data/saved_model/tokenizer_{}.pkl'.format(self.input_dim), 'wb') as f:
+        
+        with open(self.tokenize_path, 'wb') as f:
             pickle.dump(self.tokenizer, f)
 
     def tokenize_load(self):
         print('Loading Tokenizer')
-        with open('data/saved_model/tokenizer_{}.pkl'.format(self.input_dim), 'rb') as f:
+        with open(self.tokenize_path, 'rb') as f:
             self.tokenizer=pickle.load(f)
             self.vocab_size = len(self.tokenizer.word_index)
 
