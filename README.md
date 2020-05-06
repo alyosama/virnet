@@ -33,10 +33,6 @@ python predict.py --input_dim=500 --input=data/test/data.fna --output=output.csv
 python train.py --input_dim=<n> --data=<data_folder> --work_dir=<work_dir>
 ```
 
-## Accepted Conference 
-http://www.icces.org.eg
-
-
 
 ## Reference and Citation
 please cite this paper, if you use our method:
@@ -51,11 +47,9 @@ please cite this paper, if you use our method:
 }
 ```
 
-## Copyright
-Copyright (C) 2018 Faculty of Engineering, Ain Shams University
-Author: Aly O. Abdelkareem
+## Author: 
+Aly O. Abdelkareem
 
 
 ## License
-This program is freely available and Commercial users should contact Eng. Aly at aly.osama@eng.asu.edu.eg
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+Apache-2.0
